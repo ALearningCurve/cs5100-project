@@ -6,7 +6,7 @@ import zipfile
 from pathlib import Path
 from typing import Any, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, TypeAdapter
 
 
 class Recipe(BaseModel):
