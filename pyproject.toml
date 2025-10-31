@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "mypy>=1.18.2",
+    "pandas>=2.3.3",
     "pydantic>=2.12.3",
     "ruff>=0.14.3",
 ]
