@@ -1,4 +1,3 @@
-from src.paprika.parser import Recipe
 import pandas as pd
 
 INPUT_PATH = "data/export.json"
