@@ -209,3 +209,4 @@ __marimo__/
 
 # VSCode
 .vscode
+uv.lock

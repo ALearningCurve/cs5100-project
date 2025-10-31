@@ -4,4 +4,61 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "mypy>=1.18.2",
+    "pydantic>=2.12.3",
+    "ruff>=0.14.3",
+]
+
+[tool.mypy]
+strict = true
+disallow_untyped_defs = true
+namespace_packages = true
+explicit_package_bases = true
+mypy_path = "stubs"
+
+[[tool.mypy.overrides]]
+module = "mypy-untyped_package.*"
+follow_untyped_imports = true
+
+
+[tool.ruff]
+line-length = 88
+indent-width = 2
+target-version = "py313"
+[tool.ruff.lint.pydocstyle]
+convention = "google" 
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.29.5",
+]
+
+[tool.ruff.lint]
+select = [
+    "D", 
+    "E", 
+    "F", 
+    "ANN", 
+    "B", 
+    "A", 
+    "LOG", 
+    "R", 
+    "EM",
+    "R",
+    "Q0",
+    "I",
+    "N",
+    "TRY",
+    "TID",
+    "PLR"
+]
+ignore = ["D104", "D100", "D205", "TRY002"]
+
+fixable = ["ALL"]
+unfixable = []
+
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
