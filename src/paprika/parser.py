@@ -1,9 +1,10 @@
 """This module contains functions and datatypes to parse a paprika export."""
 
+import gzip
 import json
 import zipfile
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel
 
@@ -11,29 +12,29 @@ from pydantic import BaseModel
 class Recipe(BaseModel):
   """Represents a recipe in the archive with various attributes."""
 
-  uid: Optional[str] = None
-  created: Optional[str] = None
-  hash: Optional[str] = None
-  name: Optional[str] = None
-  description: Optional[str] = None
-  ingredients: Optional[str] = None
-  directions: Optional[str] = None
-  notes: Optional[str] = None
-  nutritional_info: Optional[str] = None
-  prep_time: Optional[str] = None
-  cook_time: Optional[str] = None
-  total_time: Optional[str] = None
-  difficulty: Optional[str] = None
-  servings: Optional[str] = None
-  rating: Optional[float] = None
-  source: Optional[str] = None
-  source_url: Optional[str] = None
+  uid: str
+  created: str
+  hash: str
+  name: str
+  description: str
+  ingredients: str
+  directions: str
+  notes: str
+  nutritional_info: str
+  prep_time: str
+  cook_time: str
+  total_time: str
+  difficulty: str
+  servings: str
+  rating: float
+  source: str
+  source_url: str
   photo: Optional[str] = None
   photo_large: Optional[str] = None
   photo_hash: Optional[str] = None
   image_url: Optional[str] = None
   photo_data: Optional[str] = None
-  photos: Optional[str] = None
+  photos: list[Any]
   categories: list[str] = []
 
 
@@ -52,8 +53,11 @@ def parse(path: Path) -> list[Recipe]:
   recipes: list[Recipe] = []
   # 1. parse as zip
   with zipfile.ZipFile(path, "r") as archive:
-    # 2. extract each archive from the namelist
+    # 2. extract each compressed recipe from the zip
     for recipe_name in archive.namelist():
-      with archive.open(recipe_name) as recipe_fp:
-        recipes.append(Recipe(**json.load(recipe_fp)))
+      with (
+        archive.open(recipe_name, "r") as zipped_fp,
+        gzip.open(zipped_fp) as unzipped_fp,
+      ):
+        recipes.append(Recipe(**json.load(unzipped_fp)))
   return recipes

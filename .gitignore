@@ -210,3 +210,6 @@ __marimo__/
 # VSCode
 .vscode
 uv.lock
+
+.export.paprika_recipes.*
+resources/paprika/.export.paprikarecipes.parsed.json
