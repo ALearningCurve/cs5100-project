@@ -5,8 +5,8 @@ from pathlib import Path
 
 from pydantic import TypeAdapter
 
+from src.paprika.cleanse_and_enrich import clean_and_enrich_recipes
 from src.paprika.parser import Recipe, parse
-from src.paprika.transform import transform
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +29,7 @@ def main() -> None:
   args = parser.parse_args()
 
   # 2. parse and save parsed json
-  logger.info("E: parsing export archive")
+  logger.info("E - parsing export archive")
   archive: Path = args.path
   recipes = parse(archive)
   save_path = archive.parent / f".{archive.name}.parsed.json"
@@ -37,11 +37,13 @@ def main() -> None:
     output.write(TypeAdapter(list[Recipe]).dump_json(recipes, indent=2))
 
   # 3. do basic data cleaning
-  logger.info("T: initial data cleaning & preprocessing")
-  cleaned_recipes = transform(recipes)
+  logger.info("T - initial data cleaning & preprocessing (1/2)")
+  _ = clean_and_enrich_recipes(recipes)
+
+  logger.info("T - vectorization (2/2)")
 
   # 4. load the data to the vector db
-  logger.info("L: chunking + inserting to vector DB")
+  logger.info("L: load to DB")
 
 
 if __name__ == "__main__":
