@@ -6,16 +6,13 @@ Agentic RAG for Cooking Recipes
 
 1. Install `uv` [(installation docs)](https://docs.astral.sh/uv/getting-started/installation/)
 2. (Optional) If you want to use your own recipes instead of the default ones in the repo, [export your own cookbook in 'paprika recipe format'](https://paprikaapp.zendesk.com/hc/en-us/articles/360051324613-What-export-formats-do-you-support), and then replace the exported file in `resources/paprika/export.paprikarecipes`
-3. Run `make` - this will install dependencies, build databases, and start the GUI application. See [advanced usage](#advanced-usage) for more information on each of the commands run by this abstraction and for control on GPU vs CPU device usage.
+3. Run `export ARCH=cu128` or `export ARCH=cpu` to install for cpu or gpu version of this code. Then, in the same terminal, run `make` - this will install dependencies, build databases, and start the GUI application. See [advanced usage](#advanced-usage) for more information on each of the commands run by this abstraction and for control on GPU vs CPU device usage.
+    - Aftter this first invocation of make, there is no need to set the ARCH environment variable as this is only used for dependency installation. 
 
 ### Advanced Usage
 
-Installing dependencies manually & choosing whether or not to use GPU/CPU:
+If the first time you ran make you didn't select the correct architecture, you need to reinstall dependencies manually, or need to change whether or not to use GPU/CPU:
 ```sh
-make .venv # runs uv sync
-
-# above command **should** automatically install torch w/ cuda or cpu for your system
-# if you notice that it does not or you want to use cpu only, run following commands:
 uv sync --extra cu128 # switch from torch CPU -> torch GPU (cuda >=12.8)
 uv sync --extra cpu   # switch from torch GPU -> torch CPU
 ```

@@ -17,6 +17,8 @@ from src.paprika.chunker import Chunk
 
 CHROMA_ROOT = REPO_ROOT / "resources" / "chroma"
 """Directory for the chroma vector store to be persisted to"""
+EMBEDDINGS_MODEL_NAME = "sentence-transformers/all-mpnet-base-v2"
+"""The model to use for vector/semantic search."""
 
 
 @lru_cache(1)  # use LRU cache to make this a lazy loaded portion of the application
@@ -28,8 +30,9 @@ def _embeddings() -> Embeddings:
   """
   # @ALearningCurve 10-30: do we need fine-tuning of the embedding model?
   # > @ALearningCurve 11-1: after experimentation this seems to work well
+
   return HuggingFaceEmbeddings(
-    model_name="sentence-transformers/all-mpnet-base-v2",
+    model_name=EMBEDDINGS_MODEL_NAME,
     show_progress=True,
   )
 
