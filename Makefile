@@ -1,22 +1,19 @@
 .PHONY: default setup lint lint-fix clean
 
-default: setup
+default: run
 
-setup: 
-	make .venv
-	
 .venv:
-	pip install uv
-	python3 -m uv sync
+	UV_TORCH_BACKEND=auto uv sync
 
+.build: .venv
+	uv run -m src.cmd.paprika_etl
+	echo "build placeholder" >> .build
 
-build:
-	uv run -m src.cmd.import_paprika
-# 	uncomment to cache this step
-# 	mkdir -p build
+run: .build
+	uv run -m src.cmd.start_app
 
 clean:
-	rm -rf build
+	rm -rf resources/chroma
 
 lint:
 	uv run ruff check

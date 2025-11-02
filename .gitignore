@@ -214,3 +214,4 @@ uv.lock
 .export.paprika_recipes.*
 resources/paprika/.export.paprikarecipes.parsed.json
 resources/paprika
+resources/chroma
