@@ -32,6 +32,10 @@ lint: .venv
 	uv run ruff check
 	uv run mypy --cache-fine-grained src
 
+lint-ci: .venv
+	uv run ruff check
+	uv run mypy src
+
 lint-fix: .venv
 	uv run ruff check --fix
 	uv run ruff format
