@@ -1,3 +1,11 @@
+"""Does E2E tests for paprika rapacke command.
+
+We mainly just want to make sure that the repackaging
+of paprika export json to paprika binary format
+stays consistent across changes, not necessarily
+that the repackaging logic is perfect.
+"""
+
 import sys
 from pathlib import Path
 from shutil import copyfile
@@ -11,15 +19,16 @@ from src.paprika.parser import parse
 
 def test_happy_path(tmp_path: Path) -> None:
   """Make sure the command runs end to end for simple case."""
+  # GIVEN: input and expected output files
   wanted_input = REPO_ROOT / "tests" / "fixtures" / "paprika" / "export.json"
   wanted_output = REPO_ROOT / "tests" / "fixtures" / "paprika" / "export.paprikarecipes"
 
-  # 1. copy the input to a temp file
+  # AND: temp input and output files
   temp_input = tmp_path / "export.json"
   temp_output = tmp_path / "export.paprikarecipes"
   copyfile(wanted_input, temp_input)
 
-  # 2. run the command
+  # WHEN: we run the command
   sys.argv = [
     "fake_prog",
     str(temp_input),
@@ -27,7 +36,7 @@ def test_happy_path(tmp_path: Path) -> None:
   ]
   main()
 
-  # 3. check that the output file exists and is the same as the expected output
+  # THEN: the output file is as expected
   assert temp_output.exists()
   assert parse(temp_output) == parse(wanted_output)
 
@@ -47,7 +56,10 @@ def test_missing_inputs(capsys: pytest.CaptureFixture[str], argv: list[str]) -> 
       capsys: pytest capture fixture
       argv: the argv to pass to the main function
   """
+  # GIVEN: missing required inputs
   sys.argv = ["fake_prog", *argv]
+
+  # WHEN/THEN: running the command raises SystemExit with helpful message
   with pytest.raises(SystemExit) as sysexit:
     main()
   assert sysexit.value.code == 2  # noqa: PLR2004

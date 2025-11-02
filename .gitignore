@@ -211,8 +211,7 @@ __marimo__/
 .vscode
 uv.lock
 
-.export.paprika_recipes.*
-resources/paprika/.export.paprikarecipes.parsed.json
-resources/paprika
+# custom stuff
+resources/paprika 
 resources/chroma
 .build

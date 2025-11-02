@@ -3,7 +3,7 @@ import logging
 
 from pydantic import TypeAdapter
 
-from src.env import PAPRIKA_EXPORT_PATH
+from src import env
 from src.paprika.chunker import Chunker
 from src.paprika.cleanse_and_enrich import clean_and_enrich_recipes
 from src.paprika.parser import Recipe, parse
@@ -17,9 +17,11 @@ def main() -> None:
   logger.info("Importing paprika data...")
 
   # 2. parse and save parsed json
-  logger.info(f"E - parsing export archive {str(PAPRIKA_EXPORT_PATH)}")
-  recipes = parse(PAPRIKA_EXPORT_PATH)
-  save_path = PAPRIKA_EXPORT_PATH.parent / f".{PAPRIKA_EXPORT_PATH.name}.parsed.json"
+  logger.info(f"E - parsing export archive {str(env.PAPRIKA_EXPORT_PATH)}")
+  recipes = parse(env.PAPRIKA_EXPORT_PATH)
+  save_path = (
+    env.PAPRIKA_EXPORT_PATH.parent / f".{env.PAPRIKA_EXPORT_PATH.name}.parsed.json"
+  )
   with open(save_path, "wb") as output:
     output.write(TypeAdapter(list[Recipe]).dump_json(recipes, indent=2))
 

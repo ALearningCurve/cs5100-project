@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 from src.paprika.cleanse_and_enrich import Recipe
 
-SECTIONS_TO_CHUNK = [
+SECTIONS_TO_CHUNK = {
   "description",
   "name_cleaned",
   "ingredients",
@@ -11,7 +11,7 @@ SECTIONS_TO_CHUNK = [
   "nutritional_info",
   "difficulty",
   "categories_cleaned",
-]
+}
 """These are fields in the recipe which we want to embed."""
 
 

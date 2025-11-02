@@ -37,4 +37,5 @@ lint-fix:
 	make lint
 
 test:
-	uv run pytest .
+	uv run pytest -r .
+	# modify this 'make test' recipe with -A to see logs for all
