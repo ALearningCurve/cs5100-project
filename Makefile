@@ -27,15 +27,15 @@ clean:
 	rm -rf resources/chroma
 	rm -f resources/paprika/.*.json .build
 
-lint:
+lint: .venv
 	uv run ruff check
 	uv run mypy --cache-fine-grained src
 
-lint-fix:
+lint-fix: .venv
 	uv run ruff check --fix
 	uv run ruff format
 	make lint
 
-test:
+test: .venv
 	uv run pytest -r .
 	# modify this 'make test' recipe with -A to see logs for all
