@@ -26,6 +26,9 @@ dependencies = [
 ##### > Added GPU and CPU versions of torch 
 ##### > In theory, UV should automatically select 
 ##### > correct GPU 
+##### See https://docs.astral.sh/uv/guides/integration/pytorch/#installing-pytorch
+##### for the original code this was adapted from
+#####
 [project.optional-dependencies]
 cpu = [
   "torch>=2.7.0",

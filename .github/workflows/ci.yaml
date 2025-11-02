@@ -24,8 +24,15 @@ jobs:
       env:
         ARCH: cpu
 
+    - name: mypy cache
+      uses: actions/cache@v4
+      with:
+        path: .mypy_cache
+        key: ${{ runner.os }}-mypy-${{ hashFiles('pyproject.toml') }}
+        restore-keys: ${{ runner.os }}-mypy-
+
     - name: Lint
-      run: make lint
+      run: make lint-ci
 
   test:
     runs-on: ubuntu-latest
