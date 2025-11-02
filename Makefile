@@ -24,6 +24,7 @@ run: .build
 	uv run -m src.cmd.start_app
 
 clean:
+	rm -rf .venv
 	rm -rf resources/chroma
 	rm -f resources/paprika/.*.json .build
 
