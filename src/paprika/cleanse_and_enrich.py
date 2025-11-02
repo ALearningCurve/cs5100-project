@@ -1,3 +1,8 @@
+"""See the file: src/paprika/data_exploration_and_cleaning.ipynb
+for glimpse at the data profiling which inspired this file to be
+added as part of the pipeline.
+"""
+
 import io
 import logging
 from datetime import datetime
@@ -50,23 +55,46 @@ class Recipe(BaseModel):
   categories_cleaned: list[str]
 
 
-def _2d_unique(series: pd.Series) -> pd.Series:
-  # TODO @ALearningCurve add comment
+def _2d_unique(series: pd.Series) -> np.ndarray:
+  """Does numpy across 2-dimensional series.
+
+  Args:
+      series: the series to do uniqueness check for
+
+  Returns:
+      numpy array of unique elements
+  """
   # inspired by method in https://stackoverflow.com/a/55189967
   return np.unique(np.concatenate(series.values))
 
 
 def _print_summary_stats(df: pd.DataFrame) -> None:
-  # TODO @ALearningCurve add comment
+  """Prints basic summary stats of dataframe using a logger.
+
+  Args:
+      df: the dataframe to display stats for.
+  """
   info = io.StringIO()
   df.info(buf=info)
   logger.debug(f"Summary Stats: {df.shape=}\n\n{df.columns=}\ninfo={info.getvalue()}")
 
 
-def _parse_categories(s: list[str]) -> list[str]:
-  # TODO @ALearningCurve add comment
+def _parse_categories(categories: list[str]) -> list[str]:
+  """Does data cleaning on the categories.
+
+  Harmonizes following patterns:
+  - removes unneeded whitespace
+  - replaces non-ascii character with ascii equivalent
+  - handle numeric and underscore format used for internal organization
+
+  Args:
+      categories: list of categories to harmonize
+
+  Returns:
+      the harmonize category tags
+  """
   cleaned = []
-  for tag in s:
+  for tag in categories:
     tag = tag.strip()
 
     # remove numeric prefix like 1' or 2'
@@ -77,6 +105,7 @@ def _parse_categories(s: list[str]) -> list[str]:
     if tag.startswith("_"):
       tag = tag[1:]
 
+    # skip empty tags after cleansing (have no data for us!)
     if len(tag) == 0:
       continue
 
@@ -85,6 +114,14 @@ def _parse_categories(s: list[str]) -> list[str]:
 
 
 def _to_pydantic(df: pd.DataFrame) -> list[Recipe]:
+  """Converts dataframe into pydantic representation (for other parts of app).
+
+  Args:
+      df: dataframe to convert
+
+  Returns:
+      list where returned[i] is the pydantic model of the i'th row of the dataframe
+  """
   recipes: list[Recipe] = []
   for _, recipe in df.iterrows():
     recipes.append(Recipe(**recipe.to_dict()))
@@ -174,24 +211,26 @@ def clean_and_enrich_recipes(recipes: list[RawRecipe]) -> list[Recipe]:
     logger.debug(f"\ncreating duration in minutes column for '{time_column}'")
 
     # try to convert disparate time formats
-    temp = df[time_column].str.replace("mins", "minutes")
-    temp = temp.str.replace("hrs", "hours")
+    durations = df[time_column].str.replace("mins", "minutes")
+    durations = durations.str.replace("hrs", "hours")
 
     # remove bad formats
-    temp = temp.mask(
-      temp.str.contains(r"\b(?:or|chilling)\b", case=False, na=False), pd.NA
+    durations = durations.mask(
+      durations.str.contains(r"\b(?:or|chilling)\b", case=False, na=False), pd.NA
     )
-    temp = temp.mask(temp.str.contains(r"[-–—\\\/:]", na=False), pd.NA)
+    durations = durations.mask(durations.str.contains(r"[-–—\\\/:]", na=False), pd.NA)
 
     # show the amount of rows which could not be converted
     logger.debug(
-      f"ignoring {temp.isna().sum() - df[time_column].isna().sum()}"
+      f"ignoring {durations.isna().sum() - df[time_column].isna().sum()}"
       " rows due to poor formatting"
     )
 
     # do basic time conversion
-    temp = (pd.to_timedelta(temp).dt.total_seconds() // 60).astype(pd.Int64Dtype())
-    df[f"{time_column}_min"] = temp
+    duration_mins = (pd.to_timedelta(durations).dt.total_seconds() // 60).astype(
+      pd.Int64Dtype()
+    )
+    df[f"{time_column}_min"] = duration_mins
 
   # 2.8. drop any recipes which have no notes, directions, descriptions,
   # ingredients, or usable names!
