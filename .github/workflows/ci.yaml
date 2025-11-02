@@ -45,6 +45,8 @@ jobs:
 
     - name: Install Deps
       run: make .venv
+      env:
+        ARCH: cpu
 
     - name: Run Tests
       run: make test

@@ -7,7 +7,6 @@ requires-python = ">=3.12"
 dependencies = [
     "langchain-community>=0.4.1",
     "langchain>=1.0.3",
-    #    "langchain-google-genai>=3.0.0",
     "mypy>=1.18.2",
     "numpy>=2.3.4",
     "pandas>=2.3.3",
@@ -30,11 +29,9 @@ dependencies = [
 [project.optional-dependencies]
 cpu = [
   "torch>=2.7.0",
-  "torchvision>=0.22.0",
 ]
 cu128 = [
   "torch>=2.7.0",
-  "torchvision>=0.22.0",
 ]
 
 [tool.uv]
@@ -47,10 +44,6 @@ conflicts = [
 
 [tool.uv.sources]
 torch = [
-  { index = "pytorch-cpu", extra = "cpu" },
-  { index = "pytorch-cu128", extra = "cu128" },
-]
-torchvision = [
   { index = "pytorch-cpu", extra = "cpu" },
   { index = "pytorch-cu128", extra = "cu128" },
 ]
