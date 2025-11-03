@@ -210,3 +210,8 @@ __marimo__/
 # VSCode
 .vscode
 uv.lock
+
+# custom stuff
+resources/paprika 
+resources/chroma
+.build

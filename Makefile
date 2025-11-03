@@ -1,28 +1,41 @@
-.PHONY: default setup lint lint-fix clean
+.PHONY: default setup lint lint-fix clean test
+default: run
 
-default: setup
 
-setup: 
-	make .venv
-	
+
+ARCH ?=
+
+# Conditionally set the extra flag for uv sync
+ifeq ($(ARCH),)
+    EXTRAS_FLAG :=
+else
+    EXTRAS_FLAG := --extra $(ARCH)
+endif
+
+
 .venv:
-	pip install uv
-	python3 -m uv sync
+	UV_TORCH_BACKEND=auto uv sync $(EXTRAS_FLAG)
 
+.build: .venv
+	uv run -m src.cmd.paprika_etl
+	echo "build placeholder" >> .build
 
-build:
-	uv run -m src.cmd.import_paprika
-# 	uncomment to cache this step
-# 	mkdir -p build
+run: .build
+	uv run -m src.cmd.start_app
 
 clean:
-	rm -rf build
+	rm -rf resources/chroma
+	rm -f resources/paprika/.*.json .build
 
 lint:
 	uv run ruff check
-	uv run mypy .
+	uv run mypy --cache-fine-grained src
 
 lint-fix:
 	uv run ruff check --fix
 	uv run ruff format
 	make lint
+
+test:
+	uv run pytest -r .
+	# modify this 'make test' recipe with -A to see logs for all

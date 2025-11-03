@@ -5,10 +5,70 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "langchain-community>=0.4.1",
+    "langchain>=1.0.3",
+    #    "langchain-google-genai>=3.0.0",
     "mypy>=1.18.2",
+    "numpy>=2.3.4",
+    "pandas>=2.3.3",
+    "pandas-stubs>=2.3.2.250926",
     "pydantic>=2.12.3",
+    "python-dotenv>=1.2.1",
     "ruff>=0.14.3",
+    "langchain-huggingface>=1.0.0",
+    "langchain-chroma>=1.0.0",
+    "sentence-transformers>=5.1.2",
+    "pytest>=8.4.2",
+    "pytest-timeout>=2.4.0",
 ]
+
+#####
+##### GPU ACCELERATION SECTION - START
+##### > Added GPU and CPU versions of torch 
+##### > In theory, UV should automatically select 
+##### > correct GPU 
+[project.optional-dependencies]
+cpu = [
+  "torch>=2.7.0",
+  "torchvision>=0.22.0",
+]
+cu128 = [
+  "torch>=2.7.0",
+  "torchvision>=0.22.0",
+]
+
+[tool.uv]
+conflicts = [
+  [
+    { extra = "cpu" },
+    { extra = "cu128" },
+  ],
+]
+
+[tool.uv.sources]
+torch = [
+  { index = "pytorch-cpu", extra = "cpu" },
+  { index = "pytorch-cu128", extra = "cu128" },
+]
+torchvision = [
+  { index = "pytorch-cpu", extra = "cpu" },
+  { index = "pytorch-cu128", extra = "cu128" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+
+#####
+##### GPU ACCELERATION SECTION - END
+#####
 
 [tool.mypy]
 strict = true
@@ -62,3 +122,9 @@ fixable = ["ALL"]
 unfixable = []
 
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+timeout = 10
+#log_cli = true
+log_level = "DEBUG"

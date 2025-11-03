@@ -1,0 +1,2 @@
+- `export.paprikarecipes`: dummy export with just two recipes
+- `export.json`: the parsed, yet uncleaned version of the above export as a json
