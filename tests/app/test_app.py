@@ -13,7 +13,7 @@ from langchain_core.language_models.fake_chat_models import GenericFakeChatModel
 from langchain_core.messages import AIMessage, ToolCall, ToolMessage
 
 from src import env
-from src.cmd.start_app import handle_input
+from src.app import handle_input
 
 REPO_ROOT = env.REPO_ROOT
 
