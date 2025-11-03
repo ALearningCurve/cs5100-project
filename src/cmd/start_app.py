@@ -1,19 +1,23 @@
 import logging
-from typing import AsyncIterator
+from functools import partial
+from typing import Any, AsyncIterator
 
 import gradio as gr
+from gradio.routes import App
+from langchain_core.messages import AIMessage
 
-from src.agent.agent import do_inference, setup_agent
+from src.agent.agent import Agent, do_inference, setup_agent
 
 logger = logging.getLogger(__name__)
 
-agent = setup_agent()
 
-
-async def foo(input_text: str, messages: str) -> AsyncIterator[gr.ChatMessage]:
+async def handle_input(
+  agent: Agent, input_text: str, messages: list[Any]
+) -> AsyncIterator[gr.ChatMessage]:
   """Gradio chat callback to handle user input + agent response.
 
   Args:
+      agent: the agent to use for inference
       input_text: prompt from the user
       messages: previous chat messages
 
@@ -23,15 +27,30 @@ async def foo(input_text: str, messages: str) -> AsyncIterator[gr.ChatMessage]:
   # approach inspireed by docs:
   # https://www.gradio.app/guides/agents-and-tool-usage#a-real-example-using-langchain-agents
   async for chunk in do_inference(agent, input_text):
-    yield gr.ChatMessage(role="assistant", content=chunk.content)
+    assert isinstance(chunk, AIMessage)
+
+    if len(chunk.content) != 0:
+      yield gr.ChatMessage(role="assistant", content=chunk.content)
+
+    if chunk.tool_calls is not None and len(chunk.tool_calls) > 0:
+      for tool_call in chunk.tool_calls:
+        yield gr.ChatMessage(
+          role="assistant",
+          content=f"Calling tool {tool_call['name']} with args {tool_call['args']}",
+          metadata={"title": f"Tool Call: {tool_call['name']}"},
+        )
 
 
-def main() -> None:
-  """Bootstraps the agentic search chat app."""
+def main() -> tuple[App, str, str]:
+  """Bootstraps the agentic search chat app.
+
+  Returns:
+      tuple of [gradio app, host, port]
+  """
   logger.info("Starting app...")
 
   demo = gr.ChatInterface(
-    foo,
+    partial(handle_input, setup_agent()),
     type="messages",
     flagging_mode="never",
     title="Agentic Search Chat App: the Cooking Guru",
@@ -45,7 +64,7 @@ def main() -> None:
     stop_btn=False,
   )
 
-  demo.launch()
+  return demo.launch()
 
 
 if __name__ == "__main__":

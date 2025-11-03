@@ -1,5 +1,5 @@
 import logging
-from typing import Any, AsyncIterator
+from typing import Any, AsyncIterator, TypeAlias
 
 from langchain.agents import create_agent
 from langchain.messages import AnyMessage, HumanMessage
@@ -13,6 +13,8 @@ from src.env import AGENT_CACHE_DB_PATH, GEMINI_API_KEY
 
 logger = logging.getLogger(__name__)
 
+Agent: TypeAlias = Runnable[Any, Any]
+
 
 def _log_tracing_info() -> None:
   """Logs langsmith tracing information for debugging purposes."""
@@ -23,7 +25,7 @@ def _log_tracing_info() -> None:
     logger.info("Langsmith tracing is DISABLED")
 
 
-def setup_agent() -> Runnable[Any, Any]:
+def setup_agent() -> Agent:
   """Creates and configures a LangChain agent using Google Gemini model
   and all required tools.
 
@@ -56,9 +58,7 @@ def setup_agent() -> Runnable[Any, Any]:
 
 
 # has type ignore since langchain type is generic!
-async def do_inference(
-  agent: Runnable[Any, Any], prompt: str
-) -> AsyncIterator[AnyMessage]:
+async def do_inference(agent: Agent, prompt: str) -> AsyncIterator[AnyMessage]:
   """Given some agent and prompt, perform inference and log/yield the chunks
   as they come in.
 
@@ -82,4 +82,5 @@ async def do_inference(
     stream_mode="updates",
   ):
     logger.info(f"\nReceived chunk: {chunk} ({type(chunk)}) \n")
-    yield chunk["model"]["messages"][-1]
+    for message in chunk["model"]["messages"]:
+      yield message
