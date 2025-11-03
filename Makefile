@@ -1,4 +1,9 @@
-include .env
+# use wildcard to check if .env exists
+# https://stackoverflow.com/questions/5553352/how-do-i-check-if-file-exists-in-makefile-so-i-can-delete-it 
+ifneq (,$(wildcard .env))
+	include .env
+endif
+
 .PHONY: default setup lint lint-fix clean test
 default: run
 

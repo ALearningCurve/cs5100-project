@@ -1,10 +1,17 @@
+import logging
 import os
 from pathlib import Path
 
 from dotenv import load_dotenv
 
+logger = logging.getLogger(__name__)
 REPO_ROOT = Path(__file__).parents[1]
-load_dotenv(REPO_ROOT / ".env")
+
+env_file = REPO_ROOT / ".env"
+if env_file.exists():
+  load_dotenv(env_file)
+else:
+  logger.warning(".env file not found at %s", env_file)
 
 get = os.environ.get
 
