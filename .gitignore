@@ -216,3 +216,4 @@ resources/paprika
 resources/chroma
 .build
 langchain_cache.db
+.gradio
