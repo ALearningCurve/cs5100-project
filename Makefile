@@ -1,3 +1,4 @@
+include .env
 .PHONY: default setup lint lint-fix clean test
 default: run
 
