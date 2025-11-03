@@ -10,7 +10,7 @@ import pytest
 from gradio import ChatMessage
 from langchain.agents import create_agent
 from langchain_core.language_models.fake_chat_models import GenericFakeChatModel
-from langchain_core.messages import AIMessage, ToolCall
+from langchain_core.messages import AIMessage, ToolCall, ToolMessage
 
 from src import env
 from src.cmd.start_app import handle_input
@@ -32,6 +32,9 @@ async def test_happy_path() -> None:
             ToolCall(name="fake_tool2", args={}, id="some-other-id"),
           ],
         ),
+        ToolMessage(
+          content="something", name="fake_tool2", tool_call_id="some-other-id"
+        ),
         "bar",
       ]
     )
@@ -44,15 +47,23 @@ async def test_happy_path() -> None:
       ChatMessage(
         content="Calling tool fake_tool1 with args {'foo': 'bar'}",
         role="assistant",
-        metadata={"title": "Tool Call: fake_tool1"},
+        metadata={"title": "Using tool 'fake_tool1' (#some-id)"},
         options=[],
       ),
       ChatMessage(
         content="Calling tool fake_tool2 with args {}",
         role="assistant",
-        metadata={"title": "Tool Call: fake_tool2"},
+        metadata={"title": "Using tool 'fake_tool2' (#some-other-id)"},
         options=[],
       ),
+    ],
+    [
+      ChatMessage(
+        content="something",
+        role="assistant",
+        metadata={"title": "Done with tool 'fake_tool2' (#some-other-id)"},
+        options=[],
+      )
     ],
     [ChatMessage(content="bar", role="assistant", options=[])],
   ]
@@ -60,8 +71,8 @@ async def test_happy_path() -> None:
   # WHEN + THEN: when the agent is prompted, we get expected
   # output stream in the format Gradio expects
   for wanted_outputs_i in wanted_outputs:
-    i = 0
-    async for item in handle_input(agent, "foobar", []):
-      assert item == wanted_outputs_i[i], f"item {i} did not match"
-      i += 1
-    assert i == len(wanted_outputs_i)
+    want_so_far = []
+    async for items in handle_input(agent, "foobar", []):
+      want_so_far.append(wanted_outputs_i[len(want_so_far)])
+
+      assert want_so_far == items

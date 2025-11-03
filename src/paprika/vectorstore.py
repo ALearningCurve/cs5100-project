@@ -1,5 +1,6 @@
 import shutil
 from functools import lru_cache
+from typing import TypeAlias
 
 from chromadb.config import Settings
 from langchain_chroma import Chroma
@@ -10,6 +11,9 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from src.env import REPO_ROOT
 from src.paprika.chunker import Chunk
+
+VectorStore: TypeAlias = Chroma
+
 
 # NOTE: most of this code is adapted from LangChain docs
 # article "Build a semantic search engine with LangChain"
@@ -37,11 +41,11 @@ def _embeddings() -> Embeddings:
   )
 
 
-def connect() -> Chroma:
+def connect() -> VectorStore:
   """Create langchain connection to ChromaDB.
 
   Returns:
-      ChromaDB langchain adapter
+      vectorstore langchain adapter
   """
   CHROMA_ROOT.mkdir(parents=True, exist_ok=True)
   return Chroma(
