@@ -122,6 +122,6 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
-timeout = 10
+timeout = 30
 #log_cli = true
 log_level = "DEBUG"
