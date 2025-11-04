@@ -57,3 +57,6 @@ jobs:
 
     - name: Run Tests
       run: make test
+      env:
+        LANGSMITH_TRACING: false
+        GEMINI_API_KEY: SOME_FAKE_KEY # todo: ${{ secrets.GEMINI_API_KEY }}

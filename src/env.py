@@ -1,10 +1,19 @@
+import logging
 import os
 from pathlib import Path
 
 from dotenv import load_dotenv
 
+logger = logging.getLogger(__name__)
 REPO_ROOT = Path(__file__).parents[1]
-load_dotenv(REPO_ROOT / ".env")
+
+env_file = REPO_ROOT / ".env"
+if env_file.exists():
+  load_dotenv(env_file)
+else:
+  logger.warning(".env file not found at %s", env_file)
+
+get = os.environ.get
 
 
 def _get_or_fail(key: str) -> str:
@@ -17,17 +26,19 @@ def _get_or_fail(key: str) -> str:
   Returns:
       value of environment variable
   """
-  val = os.environ.get(key)
+  val = get(key)
   assert val is not None and len(val.strip()) != 0, (
     f"wanted value for {key=}, instead got {val=}"
   )
   return val
 
 
-# GOOGLE_API_KEY = _get_or_fail("GOOGLE_API_KEY")
-
 PAPRIKA_EXPORT_PATH = Path(
-  os.environ.get(
-    "PAPRIKA_EXPORT_PATH", str(REPO_ROOT / "resources/paprika/export.paprikarecipes")
-  )
+  get("PAPRIKA_EXPORT_PATH", str(REPO_ROOT / "resources/paprika/export.paprikarecipes"))
 )
+
+AGENT_CACHE_DB_PATH = Path(
+  get("AGENT_CACHE_DB_PATH", str(REPO_ROOT / "resources/agent/langchain_cache.db"))
+)
+
+GEMINI_API_KEY = _get_or_fail("GEMINI_API_KEY")

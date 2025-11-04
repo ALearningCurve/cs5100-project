@@ -4,10 +4,29 @@ Agentic RAG for Cooking Recipes
 
 ## Usage
 
-1. Install `uv` [(installation docs)](https://docs.astral.sh/uv/getting-started/installation/)
-2. (Optional) If you want to use your own recipes instead of the default ones in the repo, [export your own cookbook in 'paprika recipe format'](https://paprikaapp.zendesk.com/hc/en-us/articles/360051324613-What-export-formats-do-you-support), and then replace the exported file in `resources/paprika/export.paprikarecipes`
-3. Run `export ARCH=cu128` or `export ARCH=cpu` to install for cpu or gpu version of this code. Then, in the same terminal, run `make` - this will install dependencies, build databases, and start the GUI application. See [advanced usage](#advanced-usage) for more information on each of the commands run by this abstraction and for control on GPU vs CPU device usage.
-    - Aftter this first invocation of make, there is no need to set the ARCH environment variable as this is only used for dependency installation. 
+1. Install `uv` [(installation docs)](https://docs.astral.sh/uv/getting-started/installation/).
+2. Setup environment variables: Follow instructions in [environment variables section](#environment-variables).
+3. (Optional) If you want to use your own recipes instead of the default ones in the repo, [export your own cookbook in 'paprika recipe format'](https://paprikaapp.zendesk.com/hc/en-us/articles/360051324613-What-export-formats-do-you-support), and then replace the exported file in `resources/paprika/export.paprikarecipes`
+4. Run `make` - this will install dependencies, build databases, and start the GUI application. See [advanced usage](#advanced-usage) for more information on each of the commands run by this abstraction and for control on GPU vs CPU device usage.
+
+### Environment Variables
+
+From root of repository, run `touch .env` and then in your code editor insert the following lines into the `.env` file:
+
+```sh
+GEMINI_API_KEY=YOUR-API-KEY # https://aistudio.google.com/api-keys
+ARCH=cu128 # if ARCH = cu128, installs cuda GPU requirements, otherwise if ARCH = cpu installs CPU requirements
+
+###
+# OPTIONAL ENV VARS:
+
+## change where the expected export is
+# PAPRIKA_EXPORT_PATH=resources/paprika/export.paprikarecipes 
+
+## Enable LANGSMITH observability tracing
+# LANGSMITH_TRACING=true 
+# LANGSMITH_API_KEY=YOUR-API-KEY # https://www.langchain.com/langsmith 
+```
 
 ### Advanced Usage
 
