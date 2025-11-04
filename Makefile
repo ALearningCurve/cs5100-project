@@ -48,5 +48,5 @@ lint-fix: .venv
 	make lint
 
 test: .venv
-	uv run pytest -r .
+	LANGSMITH_TRACING=false uv run pytest -r .
 	# modify this 'make test' recipe with -A to see logs for all

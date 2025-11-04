@@ -1,14 +1,19 @@
 import logging
+from typing import Any, AsyncIterator, TypeAlias
 
 from langchain.agents import create_agent
 from langchain.messages import AnyMessage, HumanMessage
-from langchain_core.runnables import Runnable
+from langchain_core.runnables import Runnable, RunnableConfig
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.checkpoint.memory import InMemorySaver
 from langsmith import utils
 
 from src.agent.cache import IDStrippingCache
 from src.env import AGENT_CACHE_DB_PATH, GEMINI_API_KEY
+
+logger = logging.getLogger(__name__)
+
+Agent: TypeAlias = Runnable[Any, Any]
 
 
 def _log_tracing_info() -> None:
@@ -20,8 +25,7 @@ def _log_tracing_info() -> None:
     logger.info("Langsmith tracing is DISABLED")
 
 
-# has type ignore since langchain type is generic!
-def setup_agent() -> Runnable:  # type: ignore
+def setup_agent() -> Agent:
   """Creates and configures a LangChain agent using Google Gemini model
   and all required tools.
 
@@ -54,29 +58,29 @@ def setup_agent() -> Runnable:  # type: ignore
 
 
 # has type ignore since langchain type is generic!
-def do_inference(agent: Runnable) -> dict[str, AnyMessage]:  # type: ignore
-  """Given some agent, perform inference with it.
+async def do_inference(agent: Agent, prompt: str) -> AsyncIterator[AnyMessage]:
+  """Given some agent and prompt, perform inference and log/yield the chunks
+  as they come in.
 
   Args:
       agent (Runnable): the agent to use for inference
+      prompt (str): the prompt to give to the agent
+
+  Yields:
+      dict[str, AnyMessage]: the chunks as they come in
   """
-  # our current app only has single-thread, so we
-  # just set thread_id to 1
-  config = {"configurable": {"thread_id": 1}}
+  config = RunnableConfig({"configurable": {"thread_id": 1}})
+  message = HumanMessage(content=prompt)
 
-  # perform inference
-  message = HumanMessage(content="Hey - hows it going?").model_dump()
-
-  # has type ignore since langchain type is generic!
-  res = agent.invoke(
+  async for chunk in agent.astream(
     {
       "messages": [
         message,
       ]
     },
-    config,  # type: ignore
-  )
-  return {"messages": res}
-
-
-do_inference(setup_agent())
+    config,
+    stream_mode="updates",
+  ):
+    logger.info(f"\nReceived chunk: {chunk} ({type(chunk)}) \n")
+    for message in chunk["model"]["messages"]:
+      yield message
