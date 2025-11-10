@@ -41,4 +41,8 @@ AGENT_CACHE_DB_PATH = Path(
   get("AGENT_CACHE_DB_PATH", str(REPO_ROOT / "resources/agent/langchain_cache.db"))
 )
 
+API_CACHE_DB_PATH = Path(
+  get("API_CACHE_DB_PATH", str(REPO_ROOT / "resources/tools/api_cache.db"))
+)
+
 GEMINI_API_KEY = _get_or_fail("GEMINI_API_KEY")

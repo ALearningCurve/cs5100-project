@@ -214,6 +214,7 @@ uv.lock
 # custom stuff
 resources/paprika 
 resources/chroma
+resources/tools
 .build
 langchain_cache.db
 .gradio

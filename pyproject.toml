@@ -22,6 +22,7 @@ dependencies = [
     "langchain-google-genai>=3.0.0",
     "gradio>=5.23.1",
     "pytest-asyncio>=1.2.0",
+    "types-requests>=2.31.0"
 ]
 
 #####

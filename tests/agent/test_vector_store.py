@@ -1,8 +1,8 @@
-from src.agent.tools import VectorStoreTools
 from src.paprika.vectorstore import VectorStore
+from src.tools.vector_store import VectorStoreTools
 
 
-def test_tool_api_works(setup_vectorstore: VectorStore) -> None:
+def test_vector_store_works(setup_vectorstore: VectorStore) -> None:
   """Test that the vectorstore tool API works as expected."""
   # GIVEN: a vectorstore populated by the ETL process
   vectorstore = setup_vectorstore

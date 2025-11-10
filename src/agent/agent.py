@@ -17,9 +17,10 @@ from langgraph.checkpoint.memory import InMemorySaver
 from langsmith import utils
 
 from src.agent.cache import IDStrippingCache
-from src.agent.tools import VectorStoreTools
 from src.env import AGENT_CACHE_DB_PATH, GEMINI_API_KEY
 from src.paprika.vectorstore import connect
+from src.tools.mealdb_wrapper import MealDBWrapper
+from src.tools.vector_store import VectorStoreTools
 
 logger = logging.getLogger(__name__)
 
@@ -80,10 +81,16 @@ def setup_agent() -> Agent:
   """
   vectorstore = connect()
   vectorstore_tools = VectorStoreTools(vectorstore=vectorstore, k=5)
+  mealdb_tool = MealDBWrapper()
 
   return create_agent(
     model=setup_model(),
-    tools=[vectorstore_tools.recipe_retriever],
+    tools=[
+      vectorstore_tools.recipe_retriever,
+      mealdb_tool.search_meal_by_name,
+      mealdb_tool.filter_recipes,
+      mealdb_tool.list_filter_options,
+    ],
     debug=True,
     system_prompt=SEARCH_AGENT_SYSTEM_PROMPT,
     checkpointer=InMemorySaver(),
