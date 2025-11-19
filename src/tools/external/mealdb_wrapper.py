@@ -1,43 +1,56 @@
-from enum import Enum
-from typing import Optional
+import logging
+from typing import List, Optional
 
 from langchain.tools import tool
 
-from src.tools.api import safe_get
+from src.tools.external.api import safe_get
+from src.tools.external.external_typing import (
+  MealDBFilterMeal,
+  MealDBFilterOption,
+  MealDBFilterOptionResponse,
+  MealDBFilterOptionTypes,
+  MealDBFilterResponse,
+  MealDBMeal,
+  MealDBSearchResponse,
+  Params,
+)
 
 MEALDB_BASE_URL = "https://www.themealdb.com/api/json/v1/1"
 SEARCH_MEAL_BY_NAME_URL = f"{MEALDB_BASE_URL}/search.php"
 FILTER_BY_X_URL = f"{MEALDB_BASE_URL}/filter.php"
 LIST_OPTIONS_URL = f"{MEALDB_BASE_URL}/list.php"
 
-
-class FilterOptionTypes(str, Enum):
-  """Represents types of filter options that the agent can input to
-  list_filter_options to get options to use to filter the recipes.
-  """
-
-  INGREDIENT = "i"
-  CATEGORY = "c"
-  AREA = "a"
+logger = logging.getLogger(__name__)
 
 
 class MealDBWrapper:
-  """Wrapper class for LangChain tools to reference MealDB endpoints if needed."""
+  """Wrapper class to reference MealDB endpoints if needed."""
+
+  _instance: Optional["MealDBWrapper"] = None
+
+  def __new__(cls) -> "MealDBWrapper":
+    """Creates a new instance of SpoonacularWrapper if one does not exist.
+    Else, returns the existing instance.
+
+    Returns:
+      Singleton instance of SpoonacularWrapper.
+    """
+    if cls._instance is None:
+      cls._instance = super().__new__(cls)
+    return cls._instance
 
   @staticmethod
-  @tool
-  def search_meal_by_name(meal_name: str) -> str:
+  def search_meal_by_name(meal_name: str) -> Optional[List[MealDBMeal]]:
     """Calls MealDB search meal by name endpoint with the given meal_name.
-
-    Use this tool to search for a recipe for a meal with a specific name.
 
     Args:
         meal_name: name of meal to query MealDB for a recipe for
 
     Returns:
-        string of json response from MealDB
+        string of json response from MealDB representing info about the meal
     """
-    return safe_get(SEARCH_MEAL_BY_NAME_URL, {"s": meal_name})
+    response = safe_get(SEARCH_MEAL_BY_NAME_URL, {"s": meal_name}, MealDBSearchResponse)
+    return response.meals if response else None
 
   @staticmethod
   @tool
@@ -45,7 +58,7 @@ class MealDBWrapper:
     ingredient: Optional[str] = None,
     category: Optional[str] = None,
     area: Optional[str] = None,
-  ) -> str:
+  ) -> Optional[List[MealDBFilterMeal]]:
     """Calls MealDB filter by one of ingredient, category, or area.
 
     Use this tool when the user asks for recipes "with ingredient", "from area", and
@@ -66,7 +79,7 @@ class MealDBWrapper:
         string of json response from MealDB containing meals with main ingredient
     """
     # only include in params if the function is called with it
-    params = {
+    params: Params = {
       key: value
       for key, value in {"i": ingredient, "c": category, "a": area}.items()
       if value is not None
@@ -74,22 +87,26 @@ class MealDBWrapper:
 
     # verify only one param is passed in
     if len(params) > 1:
-      return "Could not filter with more than one keyword"
+      logger.warning("Could not filter with more than one keyword")
+      return None
 
-    return safe_get(FILTER_BY_X_URL, params)
+    response = safe_get(FILTER_BY_X_URL, params, MealDBFilterResponse)
+    return response.meals if response else None
 
   @staticmethod
   @tool
-  def list_filter_options(filter_option_type: FilterOptionTypes) -> str:
+  def list_filter_options(
+    filter_option_type: MealDBFilterOptionTypes,
+  ) -> Optional[List[MealDBFilterOption]]:
     """Calls MealDB endpoint to get a list of filter options for the given type.
 
     Use this tool when the user asks for options for ingredients, categories, and areas
     to filter by.
 
     Example calls:
-    - filter_recipes(FilterOptionTypes.INGREDIENT)
-    - filter_recipes(FilterOptionTypes.CATEGORY)
-    - filter_recipes(FilterOptionTypes.AREA)
+    - filter_recipes(MealDBFilterOptionTypes.INGREDIENT)
+    - filter_recipes(MealDBFilterOptionTypes.CATEGORY)
+    - filter_recipes(MealDBFilterOptionTypes.AREA)
 
     Args:
         filter_option_type: types of filters to get options for
@@ -98,4 +115,7 @@ class MealDBWrapper:
         string of json response from MealDB containing options of things to filter by
         for the given type
     """
-    return safe_get(LIST_OPTIONS_URL, {filter_option_type.value: "list"})
+    response = safe_get(
+      LIST_OPTIONS_URL, {filter_option_type.value: "list"}, MealDBFilterOptionResponse
+    )
+    return response.meals if response else None

@@ -3,6 +3,7 @@ from typing import Optional
 from urllib.parse import urlencode
 
 from src.env import API_CACHE_DB_PATH
+from src.tools.external.external_typing import Params
 
 CREATE_API_CACHE_STR = """
     CREATE TABLE IF NOT EXISTS api_cache (
@@ -47,7 +48,7 @@ class ApiCache:
     self.cursor.execute(CREATE_API_CACHE_STR)
     self.conn.commit()
 
-  def make_cache_key(self, url: str, params: dict[str, str] | None) -> str:
+  def make_cache_key(self, url: str, params: Optional[Params]) -> str:
     """Takes in URL and params for the API call and turns it into key for cache.
 
     Args:
@@ -64,7 +65,7 @@ class ApiCache:
 
     return url + url_postfix
 
-  def get_response(self, url: str, params: dict[str, str] | None) -> str:
+  def get_response(self, url: str, params: Optional[Params]) -> str:
     """Tries to get the response for the API call if it exists in the database.
     Else returns empty string.
 

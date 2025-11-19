@@ -19,7 +19,8 @@ from langsmith import utils
 from src.agent.cache import IDStrippingCache
 from src.env import AGENT_CACHE_DB_PATH, GEMINI_API_KEY
 from src.paprika.vectorstore import connect
-from src.tools.mealdb_wrapper import MealDBWrapper
+from src.tools.external.mealdb_wrapper import MealDBWrapper
+from src.tools.external.recipe_api import RecipeAPI
 from src.tools.vector_store import VectorStoreTools
 
 logger = logging.getLogger(__name__)
@@ -81,15 +82,17 @@ def setup_agent() -> Agent:
   """
   vectorstore = connect()
   vectorstore_tools = VectorStoreTools(vectorstore=vectorstore, k=5)
+  recipe_api_tool = RecipeAPI()
   mealdb_tool = MealDBWrapper()
 
   return create_agent(
     model=setup_model(),
     tools=[
       vectorstore_tools.recipe_retriever,
-      mealdb_tool.search_meal_by_name,
+      recipe_api_tool.search_meal_by_name,
       mealdb_tool.filter_recipes,
       mealdb_tool.list_filter_options,
+      recipe_api_tool.get_random_recipe,
     ],
     debug=True,
     system_prompt=SEARCH_AGENT_SYSTEM_PROMPT,
