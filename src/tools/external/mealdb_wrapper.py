@@ -49,7 +49,9 @@ class MealDBWrapper:
     Returns:
         string of json response from MealDB representing info about the meal
     """
-    response = safe_get(SEARCH_MEAL_BY_NAME_URL, {"s": meal_name}, MealDBSearchResponse)
+    response = safe_get(
+      SEARCH_MEAL_BY_NAME_URL, params={"s": meal_name}, model=MealDBSearchResponse
+    )
     return response.meals if response else None
 
   @staticmethod
@@ -90,7 +92,7 @@ class MealDBWrapper:
       logger.warning("Could not filter with more than one keyword")
       return None
 
-    response = safe_get(FILTER_BY_X_URL, params, MealDBFilterResponse)
+    response = safe_get(FILTER_BY_X_URL, params=params, model=MealDBFilterResponse)
     return response.meals if response else None
 
   @staticmethod
@@ -116,6 +118,8 @@ class MealDBWrapper:
         for the given type
     """
     response = safe_get(
-      LIST_OPTIONS_URL, {filter_option_type.value: "list"}, MealDBFilterOptionResponse
+      LIST_OPTIONS_URL,
+      params={filter_option_type.value: "list"},
+      model=MealDBFilterOptionResponse,
     )
     return response.meals if response else None

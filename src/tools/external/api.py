@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Type, TypeVar
+from typing import Mapping, Optional, Type, TypeVar
 
 import requests
 from pydantic import BaseModel, ValidationError
@@ -13,12 +13,18 @@ logger = logging.getLogger(__name__)
 T = TypeVar("T", bound=BaseModel)
 
 
-def safe_get(url: str, params: Params | None, model: Type[T]) -> T | None:
-  """Sends a GET request to the given URL with the given params, with try except to
-  handle errors.
+def safe_get(
+  url: str,
+  model: Type[T],
+  headers: Optional[Mapping[str, str]] = None,
+  params: Optional[Params] = None,
+) -> Optional[T]:
+  """Sends a GET request to the given URL with the given headers and params, with try
+  except to handle errors. The response is converted to type Pydantic model class T.
 
   Args:
     url: URL of endpoint to hit
+    headers: dict of headers to append to the request
     params: dict of params to append to the request
     model: Pydantic class to parse into
 
@@ -27,7 +33,7 @@ def safe_get(url: str, params: Params | None, model: Type[T]) -> T | None:
   """
   # get API cache and get response for call if cached
   api_cache = ApiCache()
-  cached_response = api_cache.get_response(url, params)
+  cached_response = api_cache.get_response(url, headers, params)
 
   # get raw json from cache or from response
   raw_json: str
@@ -36,7 +42,7 @@ def safe_get(url: str, params: Params | None, model: Type[T]) -> T | None:
   else:
     # try API call since response was not cached
     try:
-      response = requests.get(url, params=params)
+      response = requests.get(url, headers=headers, params=params)
       response.raise_for_status()
       data = response.json()
       raw_json = json.dumps(data)

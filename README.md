@@ -16,6 +16,7 @@ From root of repository, run `touch .env` and then in your code editor insert th
 ```sh
 GEMINI_API_KEY=YOUR-API-KEY # https://aistudio.google.com/api-keys
 SPOONACULAR=YOUR-API-KEY # https://spoonacular.com/food-api/console#Profile
+RAPIDAPI_API_KEY=YOUR-API-KEY # https://rapidapi.com/console > Click on your application > Copy application key
 ARCH=cu128 # if ARCH = cu128, installs cuda GPU requirements, otherwise if ARCH = cpu installs CPU requirements
 
 ###

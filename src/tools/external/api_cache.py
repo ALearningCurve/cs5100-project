@@ -1,5 +1,6 @@
+import json
 import sqlite3
-from typing import Optional
+from typing import Mapping, Optional
 from urllib.parse import urlencode
 
 from src.env import API_CACHE_DB_PATH
@@ -48,35 +49,47 @@ class ApiCache:
     self.cursor.execute(CREATE_API_CACHE_STR)
     self.conn.commit()
 
-  def make_cache_key(self, url: str, params: Optional[Params]) -> str:
+  def make_cache_key(
+    self, url: str, headers: Optional[Mapping[str, str]], params: Optional[Params]
+  ) -> str:
     """Takes in URL and params for the API call and turns it into key for cache.
 
     Args:
-        url: the URL of the API call
-        params: queries to include in the API call
+      url: the URL of the API call
+      headers: headers to include in the API call
+      params: queries to include in the API call
 
     Returns:
-        the complete URL string the API call is to, including queries
+      the complete URL string the API call is to, including queries and adding headers
+      to the end
     """
     url_postfix = ""
+    headers_string = "|headers="
+
+    if headers:
+      headers_string += json.dumps(headers, sort_keys=True)
+
     if params is not None:
       sorted_params = dict(sorted(params.items()))
       url_postfix = f"?{urlencode(sorted_params)}"
 
-    return url + url_postfix
+    return url + url_postfix + headers_string if headers else ""
 
-  def get_response(self, url: str, params: Optional[Params]) -> str:
+  def get_response(
+    self, url: str, headers: Optional[Mapping[str, str]], params: Optional[Params]
+  ) -> str:
     """Tries to get the response for the API call if it exists in the database.
     Else returns empty string.
 
     Args:
-        url: the URL of the API call
-        params: queries to include in the API call
+      url: the URL of the API call
+      headers: headers to include in the API call
+      params: queries to include in the API call
 
     Returns:
-        either the response from the API call or None
+      either the response from the API call or None
     """
-    key = self.make_cache_key(url, params)
+    key = self.make_cache_key(url, headers, params)
     return (
       self.cursor.execute(
         "SELECT response FROM api_cache WHERE key=?", (key,)
@@ -89,11 +102,11 @@ class ApiCache:
     Else returns None.
 
     Args:
-        key: the key to set within the database
-        response: the response to store within the database with the given key
+      key: the key to set within the database
+      response: the response to store within the database with the given key
 
     Returns:
-        either the response from the API call or None
+      either the response from the API call or None
     """
     self.cursor.execute(
       "INSERT OR REPLACE INTO api_cache (key, response) VALUES (?, ?)", (key, response)
