@@ -9,6 +9,13 @@ jobs:
     steps:
     - uses: actions/checkout@v5
 
+    - name: Restore API Cache
+      uses: actions/cache@v3
+      with:
+        path: resources/tools/api_cache.db
+        key: ${{ runner.os }}-api-cache-${{ hashFiles('**/*.py') }}
+        restore-keys: ${{ runner.os }}-api-cache-
+
     - name: "Set up Python"
       uses: actions/setup-python@v6
       with:
@@ -60,3 +67,4 @@ jobs:
       env:
         LANGSMITH_TRACING: false
         GEMINI_API_KEY: SOME_FAKE_KEY # todo: ${{ secrets.GEMINI_API_KEY }}
+        SPOONACULAR_API_KEY: ${{ secrets.SPOONACULAR_API_KEY }}
