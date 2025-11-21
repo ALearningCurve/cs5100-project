@@ -59,8 +59,8 @@ class SpoonacularWrapper:
     """
     response = safe_get(
       SPOONACULAR_SEARCH_URL,
-      self._attach_api_key({"query": meal_name, "number": 1}),
-      SpoonacularSearchResponse,
+      params=self._attach_api_key({"query": meal_name, "number": 1}),
+      model=SpoonacularSearchResponse,
     )
     return response.results if response else []
 
@@ -77,7 +77,9 @@ class SpoonacularWrapper:
       SPOONACULAR_BASE_URL + "/" + str(recipe_id) + "/" + SPOONACULAR_GET_RECIPE_POSTFIX
     )
     return (
-      safe_get(get_recipe_url, self._attach_api_key(), SpoonacularRecipeDetailed)
+      safe_get(
+        get_recipe_url, params=self._attach_api_key(), model=SpoonacularRecipeDetailed
+      )
       or None
     )
 
@@ -89,8 +91,8 @@ class SpoonacularWrapper:
     """
     response = safe_get(
       SPOONACULAR_RANDOM_URL,
-      self._attach_api_key({"number": 1}),
-      SpoonacularRandomRecipeResponse,
+      params=self._attach_api_key({"number": 1}),
+      model=SpoonacularRandomRecipeResponse,
     )
     return response.recipes[0] if (response and response.recipes) else None
 
@@ -110,7 +112,7 @@ class SpoonacularWrapper:
     )
     response = safe_get(
       get_similar_recipes_url,
-      self._attach_api_key({"number": 3}),
-      SpoonacularSimilarResponse,
+      params=self._attach_api_key({"number": 3}),
+      model=SpoonacularSimilarResponse,
     )
     return response.results if (response and response.results) else None

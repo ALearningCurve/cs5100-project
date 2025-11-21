@@ -68,3 +68,4 @@ jobs:
         LANGSMITH_TRACING: false
         GEMINI_API_KEY: SOME_FAKE_KEY # todo: ${{ secrets.GEMINI_API_KEY }}
         SPOONACULAR_API_KEY: ${{ secrets.SPOONACULAR_API_KEY }}
+        RAPIDAPI_API_KEY: ${{ secrets.RAPIDAPI_API_KEY }}

@@ -4,7 +4,7 @@ from typing import Dict, List, Optional, Union
 from pydantic import BaseModel, Field, HttpUrl
 
 
-# ========== MEALDB ==========#
+# ========== MEALDB ========== #
 class MealDBMeal(BaseModel):
   """Data class to represent a meal from MealDB."""
 
@@ -89,7 +89,7 @@ class MealDBFilterOptionResponse(BaseModel):
   meals: List[MealDBFilterOption]
 
 
-# ========== SPOONACULAR ==========#
+# ========== SPOONACULAR ========== #
 class SpoonacularSearchResult(BaseModel):
   """Data class to represent a result from Spoonacular search API."""
 
@@ -149,7 +149,66 @@ class SpoonacularSimilarResponse(BaseModel):
   results: List[SpoonacularSearchResult] = []
 
 
-# ========== CUSTOM ==========#
+# ========== TASTY ========== #
+
+
+class TastyComponent(BaseModel):
+  """Data class to represent a Tasty component or ingredient."""
+
+  raw_text: str
+  extra_comment: Optional[str] = None
+
+
+class TastySection(BaseModel):
+  """Data class to represent a Tasty section, or list of ingredients."""
+
+  name: Optional[str] = None
+  components: List[TastyComponent]
+
+
+class TastyTag(BaseModel):
+  """Data class to represent a Tasty tag."""
+
+  name: str
+  id: int
+  display_name: str
+  type: str
+
+
+class TastyInstruction(BaseModel):
+  """Data class to represent a Tasty instruction."""
+
+  display_text: str
+
+
+class TastyTrendingRecipe(BaseModel):
+  """Data class to represent a Tasty recipe."""
+
+  id: int
+  name: Optional[str] = ""
+  slug: Optional[str] = ""
+  seo_title: Optional[str] = ""
+  instructions: Optional[List[TastyInstruction]] = []
+  sections: List[TastySection] = []
+  tags: Optional[List[TastyTag]] = []
+  thumbnail_url: Optional[HttpUrl] = None
+  video_url: Optional[HttpUrl] = None
+
+
+class TastyGetTrendingResult(BaseModel):
+  """Data class to represent a Tasty trending result."""
+
+  name: Optional[str] = None
+  items: List[TastyTrendingRecipe] = []
+
+
+class TastyGetTrendingResponse(BaseModel):
+  """Data class to represent a Tasty response from trending feed API."""
+
+  results: List[TastyGetTrendingResult]
+
+
+# ========== CUSTOM ========== #
 class UnifiedRecipe(BaseModel):
   """Data class to represent a structured LLM-understandable recipe from
   either MealDB or Spoonacular.
@@ -221,6 +280,57 @@ class UnifiedRecipe(BaseModel):
       image_url=str(spoonacular_recipe.image),
       source_url=str(spoonacular_recipe.source_url),
       similar_recipes=similar_recipes,
+    )
+
+  @classmethod
+  def from_tasty(cls, tasty_recipe: TastyTrendingRecipe) -> "UnifiedRecipe":
+    """Initializes instance of UnifiedRecipe using TastyTrendingRecipe.
+
+    Args:
+      tasty_recipe: TastyTrendingRecipe to convert to UnifiedRecipe
+
+    Returns:
+      Given TastyTrendingRecipe as UnifiedRecipe
+    """
+    # ingredients is a list nested down, so
+    ingredients = (
+      [
+        (
+          component.raw_text
+          + (component.extra_comment if component.extra_comment else "")
+        )
+        for component in tasty_recipe.sections[0].components
+      ]
+      if tasty_recipe.sections
+      else []
+    )
+
+    # parse tags for cuisine type and category type
+    cuisine: Optional[str] = None
+    category: Optional[str] = None
+    if tasty_recipe.tags:
+      for tag in tasty_recipe.tags:
+        if tag.type == "cuisine" and cuisine is None:
+          cuisine = tag.display_name
+        elif tag.type in ["dietary", "meal"] and category is None:
+          category = tag.display_name
+
+        if tag and category:
+          break
+
+    return cls(
+      id=str(tasty_recipe.id),
+      title=tasty_recipe.name or tasty_recipe.slug or tasty_recipe.seo_title or "",
+      category=category,
+      area=cuisine,
+      instructions="\n".join(
+        [instruction.display_text.strip() for instruction in tasty_recipe.instructions]
+        if tasty_recipe.instructions
+        else []
+      ),
+      ingredients=ingredients,
+      image_url=str(tasty_recipe.thumbnail_url),
+      source_url=str(tasty_recipe.video_url),
     )
 
 
