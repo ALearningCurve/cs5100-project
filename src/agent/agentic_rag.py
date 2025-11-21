@@ -114,7 +114,15 @@ class AgenticRAG:
     # establish start of the graph
     agentic_workflow.add_edge(START, "cheffy_agent")
     agentic_workflow.add_edge("cheffy_agent", "grading_llm")
-    agentic_workflow.add_conditional_edges("grading_llm", self._grading_router_node)
+    agentic_workflow.add_conditional_edges(
+      "grading_llm",
+      self._grading_router_node,
+      dict(
+        final_answer="final_answer",
+        rewrite_question="rewrite_question",
+        **{name: name for name in TOOL_NAMES},
+      ),
+    )
 
     # connect tools to grading
     for name in TOOL_NAMES:
