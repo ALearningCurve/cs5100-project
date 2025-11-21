@@ -1,4 +1,4 @@
-"""This module defines the LangChain agent and state graph.
+"""This module defines the LangChain agent.
 
 Much of this file is adapted from LangChain docs.
 
@@ -7,11 +7,10 @@ Much of this file is adapted from LangChain docs.
 """
 
 import logging
-from typing import Any, AsyncIterator, TypeAlias
+from typing import Any, TypeAlias
 
 from langchain.agents import create_agent
-from langchain.messages import AnyMessage, HumanMessage
-from langchain_core.runnables import Runnable, RunnableConfig
+from langchain_core.runnables import Runnable
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.checkpoint.memory import InMemorySaver
 from langsmith import utils
@@ -102,45 +101,3 @@ def setup_agent() -> Agent:
     system_prompt=SEARCH_AGENT_SYSTEM_PROMPT,
     checkpointer=InMemorySaver(),
   )
-
-
-# has type ignore since langchain type is generic!
-async def do_inference(agent: Agent, prompt: str) -> AsyncIterator[AnyMessage]:
-  """Given some agent and prompt, perform inference and log/yield the chunks
-  as they come in.
-
-  Args:
-      agent (Runnable): the agent to use for inference
-      prompt (str): the prompt to give to the agent
-
-  Yields:
-      dict[str, AnyMessage]: the chunks as they come in
-  """
-  config = RunnableConfig({"configurable": {"thread_id": 1}})
-  message = HumanMessage(content=prompt)
-
-  async for chunk in agent.astream(
-    {
-      "messages": [
-        message,
-      ]
-    },
-    config,
-    stream_mode="updates",
-  ):
-    logger.info(f"\nReceived chunk: {chunk} ({type(chunk)}) \n")
-    assert isinstance(chunk, dict), "bad chunk format"
-
-    # now we need to determine which key has the messages
-    # which depends on the current state of langchain
-    if "model" in chunk:
-      messages = chunk["model"]["messages"]
-    elif "tools" in chunk:
-      messages = chunk["tools"]["messages"]
-    else:
-      err_msg = f"unexpected chunk: {chunk}"
-      raise RuntimeError(err_msg)
-
-    # iteratively yield them out for the caller to process
-    for message in messages:
-      yield message

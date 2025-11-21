@@ -2,7 +2,7 @@ import logging
 from typing import Iterator
 
 import gradio as gr
-from langchain_core.messages import AIMessage, AnyMessage, ToolMessage
+from langchain_core.messages import AIMessage, AnyMessage, HumanMessage, ToolMessage
 
 logger = logging.getLogger(__name__)
 
@@ -55,11 +55,20 @@ def _render_tool_message(message: ToolMessage) -> Iterator[gr.ChatMessage]:
 
 
 def render(message: AnyMessage) -> Iterator[gr.ChatMessage]:
-  """Renders message from chunk from stream into gradio message format."""
+  """Renders message from chunk from stream into gradio message format.
+
+  Args:
+    message: A message to format into gradio message
+
+  Returns:
+    Message as gradio message
+  """
   if isinstance(message, AIMessage):
     yield from _render_ai_message(message)
   elif isinstance(message, ToolMessage):
     yield from _render_tool_message(message)
+  elif isinstance(message, HumanMessage):
+    return  # no-op since chat already has HumanMessage
   else:
     err_msg = f"Unknown message type: {type(message)}"
     raise TypeError(err_msg)
