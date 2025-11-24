@@ -81,7 +81,10 @@ def setup_agent() -> Agent:
       the agent as a Runnable
   """
   vectorstore = connect()
-  vectorstore_tools = VectorStoreTools(vectorstore=vectorstore, k=5)
+  full_recipe_vectorstore = connect(True)
+  vectorstore_tools = VectorStoreTools(
+    vectorstore=vectorstore, full_recipe_vectorstore=full_recipe_vectorstore, k=5
+  )
   recipe_api_tool = RecipeAPI()
   recipe_api_tool = RecipeAPI()
   mealdb_tool = MealDBWrapper()

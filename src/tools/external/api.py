@@ -46,6 +46,7 @@ def safe_get(
       response.raise_for_status()
       data = response.json()
       raw_json = json.dumps(data)
+      api_cache.set_response(api_cache.make_cache_key(url, headers, params), raw_json)
     except Exception:
       logger.exception("Unexpected error when sending GET req")
       return None

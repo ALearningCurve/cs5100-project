@@ -16,13 +16,16 @@ from src.paprika.chunker import SECTIONS_TO_CHUNK
 REPO_ROOT = env.REPO_ROOT
 
 
-def test_all_chunks_in_db(setup_vectorstore: vectorstore.VectorStore) -> None:
+def test_all_chunks_in_db(
+  setup_vectorstores: tuple[vectorstore.VectorStore, vectorstore.VectorStore],
+) -> None:
   """Make sure the command runs end to end for simple case."""
   # GIVEN the vectorstore setup by the ETL
-  chroma = setup_vectorstore
+  chroma, full_recipe_chroma = setup_vectorstores
 
   # WHEN we query for all items
   recipes = chroma.get(limit=1000)
+  full_recipes = full_recipe_chroma.get(limit=1000)
 
   # THEN make sure we got the correct # of responses
   assert len(recipes["ids"]) == 18  # noqa: PLR2004, we know that there should be 18 chunks
@@ -31,6 +34,13 @@ def test_all_chunks_in_db(setup_vectorstore: vectorstore.VectorStore) -> None:
   )
   assert len(recipes["documents"]) == len(recipes["ids"])
   assert len(recipes["metadatas"]) == len(recipes["ids"])
+
+  assert len(full_recipes["ids"]) == 2  # noqa: PLR2004, we know that there should be 2 full recipes
+  assert set(full_recipes["included"]) == set(["documents", "metadatas"]), (
+    "these fields are always included"
+  )
+  assert len(full_recipes["documents"]) == len(full_recipes["ids"])
+  assert len(full_recipes["metadatas"]) == len(full_recipes["ids"])
 
   # AND make sure all recipes are represented
   recipes_found = set()
@@ -41,6 +51,11 @@ def test_all_chunks_in_db(setup_vectorstore: vectorstore.VectorStore) -> None:
   for metadata in recipes["metadatas"]:
     recipes_found.add(metadata["name"])
   assert recipes_found == wanted_names
+
+  full_recipes_found = set()
+  for metadata in full_recipes["metadatas"]:
+    full_recipes_found.add(metadata["name"])
+  assert full_recipes_found == wanted_names
 
   # AND make sure sections are represented
   sections_found = defaultdict(set)
@@ -54,6 +69,8 @@ def test_all_chunks_in_db(setup_vectorstore: vectorstore.VectorStore) -> None:
   # AND make sure that the content is non-empty
   for document in recipes["documents"]:
     assert len(document) > 0
+  for full_doc in full_recipes["documents"]:
+    assert len(full_doc) > 0
 
 
 @pytest.mark.parametrize(
@@ -64,11 +81,13 @@ def test_all_chunks_in_db(setup_vectorstore: vectorstore.VectorStore) -> None:
   ],
 )
 def test_vectorstore_search(
-  query: str, expected_recipe: str, setup_vectorstore: vectorstore.Chroma
+  query: str,
+  expected_recipe: str,
+  setup_vectorstores: tuple[vectorstore.Chroma, vectorstore.Chroma],
 ) -> None:
   """Make sure semantic search works in vectorstore."""
   # GIVEN the vectorstore setup by the ETL
-  chroma = setup_vectorstore
+  chroma, _ = setup_vectorstores
 
   # WHEN we search
   results = chroma.similarity_search(

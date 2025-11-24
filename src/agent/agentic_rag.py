@@ -78,7 +78,12 @@ class AgenticRAG:
 
     # initialize tools
     self.vectorstore = connect()
-    self.vectorstore_tools = VectorStoreTools(vectorstore=self.vectorstore, k=5)
+    self.full_recipe_vectorstore = connect(True)
+    self.vectorstore_tools = VectorStoreTools(
+      vectorstore=self.vectorstore,
+      full_recipe_vectorstore=self.full_recipe_vectorstore,
+      k=5,
+    )
     self.recipe_api_tool = RecipeAPI()
     self.mealdb_tool = MealDBWrapper()
     self.tasty_tool = TastyWrapper()

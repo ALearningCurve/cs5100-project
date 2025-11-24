@@ -7,6 +7,7 @@ import io
 import logging
 from datetime import datetime
 from typing import Optional
+from uuid import uuid4
 
 import numpy as np
 import pandas as pd
@@ -20,6 +21,7 @@ logger = logging.getLogger(__name__)
 class Recipe(BaseModel):
   """Represents a cleaned recipe."""
 
+  uuid: str
   created: datetime
 
   name: str
@@ -243,7 +245,9 @@ def clean_and_enrich_recipes(recipes: list[RawRecipe]) -> list[Recipe]:
   )
   df = dropped
 
-  # 2.9. optimize type representation
+  # 2.9. add uuid and optimize type representation
+  uuids = [str(uuid4()) for _ in range(len(df))]
+  df["uuid"] = uuids
   df = df.convert_dtypes()
   _print_summary_stats(df)
 
