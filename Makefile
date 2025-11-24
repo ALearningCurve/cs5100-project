@@ -20,7 +20,7 @@ endif
 
 
 .venv:
-	UV_TORCH_BACKEND=auto uv sync $(EXTRAS_FLAG)
+	UV_TORCH_BACKEND=auto uv sync --frozen $(EXTRAS_FLAG)
 
 .build: .venv
 	uv run -m src.cmd.paprika_etl
