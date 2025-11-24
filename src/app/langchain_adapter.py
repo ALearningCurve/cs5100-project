@@ -2,7 +2,12 @@ import logging
 from typing import Iterator
 
 import gradio as gr
-from langchain_core.messages import AIMessage, AnyMessage, HumanMessage, ToolMessage
+from langchain_core.messages import (
+  AIMessage,
+  AnyMessage,
+  HumanMessage,
+  ToolMessage,
+)
 
 logger = logging.getLogger(__name__)
 

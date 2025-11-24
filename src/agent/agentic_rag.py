@@ -223,17 +223,19 @@ class AgenticRAG:
     filtered_messages = [
       msg
       for msg in state["messages"]
-      if self._extract_text(msg).startswith(SUGGESTED_ACTION_STR)
+      if not self._extract_text(msg).startswith(SUGGESTED_ACTION_STR)
     ]
 
     # generate final prompt and call LLM for final answer
-    final_instruction = """
-        Based on all the information gathered above, provide a comprehensive answer to
-        the user's question. Make sure this answer is helpful, complete, and friendly!
-        """
+    final_instruction = (
+      "Based on all the information gathered above, make a comprehensive answer to the"
+      + " user's question. Make sure this answer is helpful, complete, and friendly!"
+      + " If you believe an existing AI response is sufficient, you may use that."
+    )
     prompt_messages = filtered_messages + [HumanMessage(content=final_instruction)]
     final_answer = self.cheffy_agent.invoke({"messages": prompt_messages})
-    return self._structure_llm_response(final_answer)
+    structured_final_messages= self._structure_llm_response(final_answer)["messages"]
+    return {"messages": [structured_final_messages[-1]]}
 
   def _grading_router_node(self, state: MessagesState) -> str:
     """Node that determines which node is the next to use based on state.
@@ -335,11 +337,12 @@ async def do_inference(graph: Workflow, prompt: str) -> AsyncIterator[AnyMessage
     # stream_mode="updates" returns {node_name: {messages: [...]}}
     if isinstance(chunk, dict):
       for node_name, node_output in chunk.items():
-        if isinstance(node_output, dict) and "messages" in node_output:
-          for msg in node_output["messages"]:
-            yield msg
-        else:
-          logger.warning(f"Node {node_name} returned invalid response")
+        if node_name in (TOOL_NAMES + ["final_answer"]): # only keep tool + final
+          if isinstance(node_output, dict) and "messages" in node_output:
+            for msg in node_output["messages"]:
+              yield msg
+          else:
+            logger.warning(f"Node {node_name} returned invalid response")
     else:
       err_msg = f"Unexpected graph chunk type: {type(chunk)}"
       raise TypeError(err_msg)
