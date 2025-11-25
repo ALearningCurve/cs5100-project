@@ -13,8 +13,10 @@ class RecipeAPI:
   @staticmethod
   @tool
   def search_meal_by_name(meal_name: str) -> Optional[UnifiedRecipe]:
-    """Searches for a recipe by a given meal name.
-    Tries MealDB then BigOven.
+    """EXTERNAL TOOL: Searches for a recipe by a given meal name using external APIs
+    and cookbooks.
+
+    Tries MealDB then BigOven APIs.
 
     Args:
       meal_name: The name of the meal to search for
@@ -48,7 +50,8 @@ class RecipeAPI:
   @staticmethod
   @tool
   def get_random_recipe(tool_input: str = "") -> Optional[UnifiedRecipe]:
-    """Gets a random recipe from Spoonacular.
+    """EXTERNAL TOOLS: Gets a random recipe from Spoonacular
+    (use external api and cookbook).
 
     Use this tool to get a random recipe.
 

@@ -19,7 +19,10 @@ class TastyWrapper:
   @staticmethod
   @tool
   def get_trending_recipes(tool_input: str = "") -> Optional[List[UnifiedRecipe]]:
-    """Calls Tasty API to get trending recipes and converts them to UnifiedRecipe type.
+    """EXTERNAL TOOL: Calls Tasty API to get trending recipes
+    and converts them to UnifiedRecipe type.
+
+    This finds external recipes.
 
     Use this tool to get trending recipes.
 

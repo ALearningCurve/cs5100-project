@@ -48,7 +48,9 @@ class VectorStoreTools(BaseModel):
         full_recipe_vectorstore=self.full_recipe_vectorstore,
       ),
       name="recipe_retriever",
-      description="Useful for searching for recipes relevant to a user's query.",
+      description="INTERNAL TOOLS: Finds recipes from the user's own "
+      "cookbook by keyword (i.e. title, "
+      "ingredient, etc) and also by similarity.",
       document_prompt=prompt_template,
     )
 

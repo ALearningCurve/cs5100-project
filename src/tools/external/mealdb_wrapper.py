@@ -61,7 +61,8 @@ class MealDBWrapper:
     category: Optional[str] = None,
     area: Optional[str] = None,
   ) -> Optional[List[MealDBFilterMeal]]:
-    """Calls MealDB filter by one of ingredient, category, or area.
+    """EXTERNAL TOOL: Find external recipes, calls MealDB filter by one of ingredient,
+    category, or area.
 
     Use this tool when the user asks for recipes "with ingredient", "from area", and
     "within category". Only include one parameters at a time, you cannot call this
@@ -100,10 +101,11 @@ class MealDBWrapper:
   def list_filter_options(
     filter_option_type: MealDBFilterOptionTypes,
   ) -> Optional[List[MealDBFilterOption]]:
-    """Calls MealDB endpoint to get a list of filter options for the given type.
+    """EXTERNAL TOOL: Find external recipes, calls MealDB endpoint to get a list of
+    filter options for the given type.
 
     Use this tool when the user asks for options for ingredients, categories, and areas
-    to filter by.
+    to filter by or before attempting to use 'filter_recipes' tool.
 
     Example calls:
     - filter_recipes(MealDBFilterOptionTypes.INGREDIENT)
