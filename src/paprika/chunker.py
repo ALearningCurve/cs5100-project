@@ -15,12 +15,33 @@ SECTIONS_TO_CHUNK = {
 """These are fields in the recipe which we want to embed."""
 
 
-class ChunkMetadata(BaseModel):
-  """This represents the metadata columns for each chunk."""
+class FullRecipeMetadata(BaseModel):
+  """This represents the metadata columns for the full recipe."""
 
+  uuid: str
   section: str
   name: str
   tags: str
+
+
+class ChunkMetadata(BaseModel):
+  """This represents the metadata columns for each chunk."""
+
+  full_doc_uuid: str
+  section: str
+  name: str
+  tags: str
+
+  def to_full_recipe_metadata(self) -> FullRecipeMetadata:
+    """Converts chunk metadata to full recipe metadata.
+
+    Returns:
+      Converted chunk metadata to full recipe metadata.
+    """
+    data = self.model_dump()
+    data["uuid"] = data.pop("full_doc_uuid")  # rename for full recipe metadata
+    data["section"] = "Full Recipe"
+    return FullRecipeMetadata(**data)
 
 
 class Chunk(BaseModel):
@@ -74,7 +95,10 @@ class Chunker:
         Chunk(
           content=f"{section}: {recipe_obj[section]}",
           metadata=ChunkMetadata(
-            name=recipe.name, tags=str(recipe.categories_cleaned), section=section
+            full_doc_uuid=recipe.uuid,
+            name=recipe.name,
+            tags=str(recipe.categories_cleaned),
+            section=section,
           ),
         )
       )

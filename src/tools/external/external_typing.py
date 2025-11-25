@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Dict, List, Optional, Union
 
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, ConfigDict, Field, HttpUrl
 
 
 # ========== MEALDB ========== #
@@ -18,10 +18,7 @@ class MealDBMeal(BaseModel):
   str_tags: Optional[str] = Field(None, alias="strTags")
   str_youtube: Optional[str] = Field(None, alias="strYouTube")
 
-  class Config:
-    """Config class for MealDBMeal."""
-
-    extra = "allow"
+  model_config = ConfigDict(extra="allow")
 
   @property
   def ingredients(self) -> List[str]:

@@ -10,10 +10,9 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from src.env import REPO_ROOT
-from src.paprika.chunker import Chunk
+from src.paprika.chunker import Chunk, ChunkMetadata
 
 VectorStore: TypeAlias = Chroma
-
 
 # NOTE: most of this code is adapted from LangChain docs
 # article "Build a semantic search engine with LangChain"
@@ -41,15 +40,19 @@ def _embeddings() -> Embeddings:
   )
 
 
-def connect() -> VectorStore:
+def connect(full_recipes: bool = False) -> VectorStore:
   """Create langchain connection to ChromaDB.
 
+  Args:
+    full_recipes: Flag of whether to connect to the full recipes collection.
+                  Defaults to False.
+
   Returns:
-      vectorstore langchain adapter
+    vectorstore langchain adapter
   """
   CHROMA_ROOT.mkdir(parents=True, exist_ok=True)
   return Chroma(
-    collection_name="recipes",
+    collection_name="recipes" if not full_recipes else "full_recipes",
     embedding_function=_embeddings(),
     client_settings=Settings(anonymized_telemetry=False),
     persist_directory=str(CHROMA_ROOT),
@@ -88,3 +91,31 @@ def load_chunks(chunks: list[Chunk]) -> None:
   # 4. connect to the db and add all the documents (this triggers embedding)
   vector_store = connect()
   vector_store.add_documents(documents=docs)
+
+
+def load_full_recipes(chunks: list[Chunk]) -> None:
+  """Combines chunks of a document and adds them to the database.
+
+  Args:
+    chunks: Chunks of recipes to combine into full recipes and add to the database.
+  """
+  # 1. merge chunks to create full_recipes
+  recipe_chunks_dict: dict[str, tuple[str, ChunkMetadata]] = {}
+  for chunk in chunks:
+    uuid = chunk.metadata.full_doc_uuid
+    full_recipe_tuple = recipe_chunks_dict.get(uuid)
+    recipe_chunks_dict[uuid] = (
+      (f"{full_recipe_tuple[0]}\n\n" if full_recipe_tuple else "") + chunk.content,
+      chunk.metadata,
+    )
+
+  full_docs = [
+    Document(
+      page_content=content, metadata=metadata.to_full_recipe_metadata().model_dump()
+    )
+    for _, (content, metadata) in recipe_chunks_dict.items()
+  ]
+
+  # 2. add to database
+  vector_store = connect(True)
+  vector_store.add_documents(documents=full_docs)

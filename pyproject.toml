@@ -5,7 +5,6 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "langchain-community>=0.4.1",
     "langchain>=1.0.3",
     "mypy>=1.18.2",
     "numpy>=2.3.4",
@@ -22,7 +21,9 @@ dependencies = [
     "langchain-google-genai>=3.0.0",
     "gradio>=5.23.1",
     "pytest-asyncio>=1.2.0",
-    "types-requests>=2.31.0"
+    "types-requests>=2.31.0",
+    "langchain-community>=0.4.1",
+    "rank-bm25>=0.2.2",
 ]
 
 #####
@@ -126,5 +127,11 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 [tool.pytest.ini_options]
 pythonpath = ["."]
 timeout = 30
-#log_cli = true
 log_level = "DEBUG"
+filterwarnings = [
+    'error',
+    'ignore::UserWarning',
+    'ignore:AgentStatePydantic has been moved',
+    'ignore:websockets.legacy is deprecated'
+]
+# SEE https://docs.pytest.org/en/latest/how-to/capture-warnings.html#controlling-warnings

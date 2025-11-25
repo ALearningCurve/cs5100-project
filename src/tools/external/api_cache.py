@@ -73,7 +73,7 @@ class ApiCache:
       sorted_params = dict(sorted(params.items()))
       url_postfix = f"?{urlencode(sorted_params)}"
 
-    return url + url_postfix + headers_string if headers else ""
+    return url + url_postfix + (headers_string if headers else "")
 
   def get_response(
     self, url: str, headers: Optional[Mapping[str, str]], params: Optional[Params]
@@ -90,12 +90,11 @@ class ApiCache:
       either the response from the API call or None
     """
     key = self.make_cache_key(url, headers, params)
-    return (
-      self.cursor.execute(
-        "SELECT response FROM api_cache WHERE key=?", (key,)
-      ).fetchone()
-      or ""
-    )
+    row = self.cursor.execute(
+      "SELECT response FROM api_cache WHERE key=?", (key,)
+    ).fetchone()
+
+    return row[0] if row else ""
 
   def set_response(self, key: str, response: str) -> None:
     """Tries to get the response for the API call if it exists in the database.

@@ -11,11 +11,11 @@ REPO_ROOT = env.REPO_ROOT
 
 
 @pytest.fixture(scope="session")
-def setup_vectorstore(
+def setup_vectorstores(
   tmp_path_factory: pytest.TempPathFactory,
-) -> Generator[vectorstore.Chroma, None, None]:
-  """Creates and yields a vectorstore populated by the ETL process
-  (for use in e2e test).
+) -> Generator[tuple[vectorstore.Chroma, vectorstore.Chroma], None, None]:
+  """Creates and yields a chunk vectorstore and a full recipe vectorstore
+  populated by the ETL process (for use in e2e test).
 
   Cleans up self after test is done.
 
@@ -23,7 +23,7 @@ def setup_vectorstore(
       tmp_path_factory: pytest tmp path factory fixture
 
   Yields:
-      the connected vectorstore
+      the connected chunk and full recipe vectorstores
   """
   # GIVEN: vectorstore location and paprika export
   vectorstore.CHROMA_ROOT = tmp_path_factory.mktemp("chroma")
@@ -37,7 +37,7 @@ def setup_vectorstore(
   main()
 
   # THEN: we can connect to the vectorstore
-  yield vectorstore.connect()
+  yield (vectorstore.connect(), vectorstore.connect(True))
 
   # FINALLY: cleanup
   if vectorstore.CHROMA_ROOT.exists():

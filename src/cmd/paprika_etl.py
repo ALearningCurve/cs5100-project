@@ -7,7 +7,7 @@ from src import env
 from src.paprika.chunker import Chunker
 from src.paprika.cleanse_and_enrich import clean_and_enrich_recipes
 from src.paprika.parser import Recipe, parse
-from src.paprika.vectorstore import load_chunks
+from src.paprika.vectorstore import load_chunks, load_full_recipes
 
 logger = logging.getLogger(__name__)
 
@@ -32,9 +32,13 @@ def main() -> None:
   logger.info("T - user space chunking (2/2)")
   chunks = Chunker.make_chunks(enriched_recipes)
 
-  # 4. load the data to the vector db
-  logger.info("L: load to DB")
+  # 4. load the chunks to the vector db
+  logger.info("L: load chunks to DB")
   load_chunks(chunks)
+
+  # 5. load the entire documents to the vector db
+  logger.info("L: load full recipes to DB")
+  load_full_recipes(chunks)
 
 
 if __name__ == "__main__":
