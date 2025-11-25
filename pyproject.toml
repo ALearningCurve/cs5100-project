@@ -127,5 +127,11 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 [tool.pytest.ini_options]
 pythonpath = ["."]
 timeout = 30
-#log_cli = true
 log_level = "DEBUG"
+filterwarnings = [
+    'error',
+    'ignore::UserWarning',
+    'ignore:AgentStatePydantic has been moved',
+    'ignore:websockets.legacy is deprecated'
+]
+# SEE https://docs.pytest.org/en/latest/how-to/capture-warnings.html#controlling-warnings
