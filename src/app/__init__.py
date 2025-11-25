@@ -5,7 +5,8 @@ from typing import AsyncIterator
 import gradio as gr
 from gradio.routes import App as App
 
-from src.agent.agentic_rag import AgenticRAG, Workflow, do_inference
+from src.agent.agent import setup_agent
+from src.agent.agentic_rag import Workflow, do_inference
 from src.app.langchain_adapter import render
 
 logger = logging.getLogger(__name__)
@@ -42,14 +43,14 @@ def launch() -> tuple[App, str, str]:
   """
   logger.info("Starting app...")
 
-  workflow = AgenticRAG().workflow
+  workflow = setup_agent()
   demo = gr.ChatInterface(
     partial(handle_input, workflow),
     type="messages",
     flagging_mode="never",
     title="Agentic Search Chat App: the Cooking Guru",
-    description="An agentic search chat app that helps you find "
-    "cooking recipes from both your own cookbook and the web.",
+    description="Hi, I'm Cheffy!\n Ask me anything cooking related - I can help you "
+    "search your own cookbook, the web, or even surprise you with new recipes!",
     examples=[
       ["I want to make a chocolate chip cookies.", ""],
       ["How do I cook a perfect steak?", ""],
