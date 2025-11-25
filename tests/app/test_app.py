@@ -1,15 +1,17 @@
 import pytest
 from gradio import ChatMessage
 
-from src.agent.agentic_rag import AgenticRAG
+from src.agent.agent import setup_agent
 from src.app import handle_input
+
+# from src.agent.agentic_rag import AgenticRAG
 
 
 @pytest.mark.asyncio
 async def test_happy_path() -> None:
   """Make sure the `handle_input` callback correctly streams the response."""
   # GIVEN: initialize the AgenticRAG workflow
-  workflow = AgenticRAG().workflow
+  workflow = setup_agent()
 
   # AND a simple prompt that's in the vectorstore
   prompt = "How do I make chocolate chip cookies?"
