@@ -1,6 +1,17 @@
-# cs5100-project
-Agentic RAG for Cooking Recipes
+# Cheffy: The Agentic RAG System for Cooking Recipes
 
+
+This project aims to create an agentic search bot to assist in the querying, retrieval, and synthesis of cooking recipes based on a given query from the user. Moving beyond a general LLM, this project aims enable a chatbot to be able to give personalized cooking advice and suggestions using both a custom database containing the user's own recipes (imported from [Paprika](https://www.paprikaapp.com/)) and various external APIs (such as [MealDB](https://www.themealdb.com/api.php), [Tasty API](https://rapidapi.com/apidojo/api/tasty), and [Spoonacular](https://spoonacular.com/food-api/console#Profile)) for searching up more general data. We have been able to implement both an ETL pipeline for paprika cookbooks and agentic search system to get great results (example conversations can be seen in the [examples section](#examples))!
+
+
+## Table of Contents
+* [Table of Contents](#table-of-contents)
+* [Usage](#usage)
+* [System Design](#system-design)
+* [Examples](#examples)
+
+
+<img width="3781" height="1765" alt="convo1_1" src="https://github.com/user-attachments/assets/ef9ec347-5b33-4c1f-8fd9-304b7a019541" />
 
 ## Usage
 
@@ -63,4 +74,32 @@ During development, lint and fix linting errors with following commands:
 ```sh
 make lint
 make lint-fix
+
 ```
+
+## System Design
+
+Below are two sequence diagrams which help to illustrate the data flow in the application
+
+### The ETL Sequence
+
+<img width="700" height="631" alt="method_paprika_etl" src="https://github.com/user-attachments/assets/8c9d4e4c-a883-413c-b475-afdd4edeab1c" />
+
+### The User Interaction Sequence
+<img width="2039" height="1051" alt="method_chatbot_sequence" src="https://github.com/user-attachments/assets/aeafbfcc-633c-44cc-b982-d9c105ceac41" />
+
+
+## Examples
+
+### Interal Search (user's custom cookbook)
+
+<img width="3781" height="1765" alt="convo1_1" src="https://github.com/user-attachments/assets/9a7e3f02-cd2f-4d6a-9943-1cf652d2a2e6" />
+<img width="3786" height="1773" alt="convo1_2" src="https://github.com/user-attachments/assets/4e3cd564-e4b4-4e89-8ab8-50830153b392" />
+<img width="3721" height="1775" alt="convo1_3" src="https://github.com/user-attachments/assets/9d0b8dbe-4a73-4095-a4a0-d0a404ed24a7" />
+
+
+### External Search (using API's)
+
+<img width="3664" height="457" alt="convo2_1" src="https://github.com/user-attachments/assets/ecaa195a-70ab-48b8-8d72-880b69e50ee3" />
+<img width="3673" height="1276" alt="convo2_2" src="https://github.com/user-attachments/assets/89ffb96d-b3c9-45ef-9bd5-7d86f8bb0263" />
+
