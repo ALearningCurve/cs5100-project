@@ -40,6 +40,7 @@ ARCH=cu128 # if ARCH = cu128, installs cuda GPU requirements, otherwise if ARCH 
 # LANGSMITH_TRACING=true 
 # LANGSMITH_API_KEY=YOUR-API-KEY # https://www.langchain.com/langsmith 
 ```
+Note, see [the LangSmith Tracing Example Image](#langsmith-tracing) to see what enabling tracing does!
 
 ### Advanced Usage
 
@@ -102,4 +103,11 @@ Below are two sequence diagrams which help to illustrate the data flow in the ap
 
 <img width="3664" height="457" alt="convo2_1" src="https://github.com/user-attachments/assets/ecaa195a-70ab-48b8-8d72-880b69e50ee3" />
 <img width="3673" height="1276" alt="convo2_2" src="https://github.com/user-attachments/assets/89ffb96d-b3c9-45ef-9bd5-7d86f8bb0263" />
+
+### LangSmith Tracing
+
+If tracing is configured in [environment variables](#environment-variables), the following type of debug view is made available (note, this view 
+tells you if cache was used, exact tool parameters, timing of inference calls, and so-on). 
+<img width="1199" height="1787" alt="langsmith_tracing" src="https://github.com/user-attachments/assets/e5492712-3286-4ad1-afaa-5725662c44db" />
+
 
