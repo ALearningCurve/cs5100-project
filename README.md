@@ -3,12 +3,14 @@
 
 This project aims to create an agentic search bot to assist in the querying, retrieval, and synthesis of cooking recipes based on a given query from the user. Moving beyond a general LLM, this project aims enable a chatbot to be able to give personalized cooking advice and suggestions using both a custom database containing the user's own recipes (imported from [Paprika](https://www.paprikaapp.com/)) and various external APIs (such as [MealDB](https://www.themealdb.com/api.php), [Tasty API](https://rapidapi.com/apidojo/api/tasty), and [Spoonacular](https://spoonacular.com/food-api/console#Profile)) for searching up more general data. We have been able to implement both an ETL pipeline for paprika cookbooks and agentic search system to get great results (example conversations can be seen in the [examples section](#examples))!
 
+The project implements both single-agent and multi-agent search. The default operating mode is single-agent, but multi-agent can also be used if you are curious (see the [Multi-Agent RAG System](#multi-agent-rag-system) section)!
+
 
 ## Table of Contents
 * [Table of Contents](#table-of-contents)
 * [Usage](#usage)
 * [System Design](#system-design)
-* [Examples](#examples)
+* [Example Images](#examples)
 
 
 <img width="3781" height="1765" alt="convo1_1" src="https://github.com/user-attachments/assets/ef9ec347-5b33-4c1f-8fd9-304b7a019541" />
@@ -80,15 +82,31 @@ make lint-fix
 
 ## System Design
 
-Below are two sequence diagrams which help to illustrate the data flow in the application
+Below image are a couple sequence diagrams which help to illustrate the data flow in the application
 
 ### The ETL Sequence
 
+This shows the sequence diagram for the Paprika export ETL into our application:
 <img width="700" height="631" alt="method_paprika_etl" src="https://github.com/user-attachments/assets/8c9d4e4c-a883-413c-b475-afdd4edeab1c" />
 
 ### The User Interaction Sequence
+
+This image shows the sequence diagram following a user prompt into our agentic search bot.
 <img width="2039" height="1051" alt="method_chatbot_sequence" src="https://github.com/user-attachments/assets/aeafbfcc-633c-44cc-b982-d9c105ceac41" />
 
+### Multi-Agent RAG System
+
+By default the system uses single-agent RAG to save on LLM API usage, however, we also wanted to experiment with multi-agent RAG.
+
+We barely noticed a difference using this approach, but if you are curious, the following is the state graph of the multi-agent workflow:
+<img width="784" height="235" alt="agentic_rag_workflow" src="https://github.com/user-attachments/assets/231a689a-763c-483a-9f64-70354cdd2bf6" />
+
+To enable the multi-agent workflow, replace the line `workflow = setup_agent()` line in [`src/app/__init__.py`](https://github.com/ALearningCurve/cs5100-project/blob/71a3b4ab1618457c0a13bb81a32272f72d3b8fbe/src/app/__init__.py#L46)
+with the following:
+```py
+ from src.agent.agentic_rag import AgenticRAG
+ workflow = AgenticRAG().workflow
+```
 
 ## Examples
 
@@ -109,5 +127,6 @@ Below are two sequence diagrams which help to illustrate the data flow in the ap
 If tracing is configured in [environment variables](#environment-variables), the following type of debug view is made available (note, this view 
 tells you if cache was used, exact tool parameters, timing of inference calls, and so-on). 
 <img width="1199" height="1787" alt="langsmith_tracing" src="https://github.com/user-attachments/assets/e5492712-3286-4ad1-afaa-5725662c44db" />
+
 
 
