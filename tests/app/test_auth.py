@@ -1,6 +1,6 @@
 """Tests for the authentication module."""
 
-# ruff: noqa: PLR2004, E501
+# ruff: noqa: PLR2004, E501, ANN401
 
 from contextlib import contextmanager
 from importlib import reload
@@ -12,7 +12,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from starlette.requests import Request
 
-from src.app.auth import AUTH_COOKIE_NAME, router
+from src.app.auth import AUTH_COOKIE_NAME
 
 
 @contextmanager
