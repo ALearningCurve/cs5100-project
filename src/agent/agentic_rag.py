@@ -315,18 +315,21 @@ class AgenticRAG:
     return target_msgs[-1]
 
 
-async def do_inference(graph: Workflow, prompt: str) -> AsyncIterator[AnyMessage]:
+async def do_inference(
+  graph: Workflow, prompt: str, thread_id: int
+) -> AsyncIterator[AnyMessage]:
   """Given some workflow and prompt, perform inference and yield the chunks
   as they come in.
 
   Args:
       graph: the workflow to use for inference
       prompt: the prompt to give to the workflow
+      thread_id: the thread_id to use
 
   Yields:
       Messages as they come in from the workflow
   """
-  config = RunnableConfig({"configurable": {"thread_id": 1}})
+  config = RunnableConfig({"configurable": {"thread_id": thread_id}})
   initial_state = {"messages": [HumanMessage(content=prompt)]}
 
   async for chunk in graph.astream(initial_state, config, stream_mode="updates"):

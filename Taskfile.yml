@@ -25,7 +25,8 @@ tasks:
     desc: Build the project
     deps: [venv]
     status:
-      - test -f .build && test "$(find src resources/paprika/export.paprikarecipes -type f -newer .build 2>/dev/null | wc -l)" -eq 0
+      - test -f .build
+      - test resources/paprika/export.paprikarecipes -ot .build
     cmds:
       - uv run -m src.cmd.paprika_etl
       - touch .build

@@ -18,7 +18,7 @@ async def test_happy_path() -> None:
   initial_messages = []
 
   # WHEN: stream output from handle_input
-  async for message_list in handle_input(workflow, prompt, initial_messages):
+  async for message_list in handle_input(workflow, prompt, initial_messages, 1):
     # THEN: verify we get a list of valid chat messages
     assert isinstance(message_list, list) and len(message_list) > 0, (
       "Expected non-empty message list"
