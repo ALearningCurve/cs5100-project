@@ -23,7 +23,7 @@ jobs:
       run: sudo snap install task --classic
 
     - name: Install Deps
-      run: task .venv
+      run: task venv
       env:
         ARCH: cpu
 
@@ -64,7 +64,7 @@ jobs:
       run: sudo snap install task --classic
 
     - name: Install Deps
-      run: task .venv
+      run: task venv
       env:
         ARCH: cpu
 
