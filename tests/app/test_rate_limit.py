@@ -40,10 +40,11 @@ class TestRateLimitingEnabled:
       app.include_router(auth_router)
       client = TestClient(app)
 
-      # Should succeed - first request
+      # Should succeed - first request (don't follow redirects)
       response = client.post(
         "/login",
         data={"username": "test", "password": "test"},
+        follow_redirects=False,
       )
       assert response.status_code in [303, 401]  # Either redirect or auth error
 
@@ -64,6 +65,7 @@ class TestRateLimitingEnabled:
         response = client.post(
           "/login",
           data={"username": "test", "password": "test"},
+          follow_redirects=False,
         )
         responses.append(response.status_code)
 
@@ -84,6 +86,7 @@ class TestRateLimitingEnabled:
       response = client.post(
         "/login",
         data={"username": "test", "password": "test"},
+        follow_redirects=False,
       )
 
       # Check for rate limit headers or successful/error response
@@ -121,6 +124,7 @@ class TestRateLimitingDisabled:
         response = client.post(
           "/login",
           data={"username": "test", "password": "test"},
+          follow_redirects=False,
         )
         # Should not return 429 (rate limit exceeded)
         assert response.status_code != 429, f"Request {i} was rate limited"
