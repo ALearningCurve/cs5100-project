@@ -2,8 +2,9 @@
 
 version: '3'
 
-env:
-  ARCH: '{{.ARCH}}'
+dotenv:
+  - ".env"
+
 
 vars:
   EXTRAS_FLAG: '{{if .ARCH}}--extra {{.ARCH}}{{end}}'
@@ -13,20 +14,10 @@ tasks:
     desc: Default task - runs the app
     deps: [run]
 
-  setup-env:
-    desc: Load .env file if it exists
-    silent: true
-
   venv:
     desc: Set up virtual environment
-    sources:
-      - pyproject.toml
-    generates:
-      - .venv
     cmds:
       - UV_TORCH_BACKEND=auto uv sync --frozen {{.EXTRAS_FLAG}}
-      - uv pip install langgraph-cli[inmem]
-    method: timestamp
 
   build:
     desc: Build the project
@@ -35,10 +26,12 @@ tasks:
       - src/**
       - resources/paprika/export.paprikarecipes
     generates:
-      - resources/chroma
+      - .build
+    status:
+      - test -f .build
     cmds:
       - uv run -m src.cmd.paprika_etl
-    method: timestamp
+      - touch .build
 
   run:
     desc: Run the application

@@ -21,7 +21,7 @@ The project implements both single-agent and multi-agent search. The default ope
 2. Install `taskfile` [(installation docs)](https://taskfile.dev/docs/installation).
 2. Setup environment variables: Follow instructions in [environment variables section](#environment-variables).
 3. (Optional) If you want to use your own recipes instead of the default ones in the repo, [export your own cookbook in 'paprika recipe format'](https://paprikaapp.zendesk.com/hc/en-us/articles/360051324613-What-export-formats-do-you-support), and then replace the exported file in `resources/paprika/export.paprikarecipes`
-4. Run `make` - this will install dependencies, build databases, and start the GUI application. See [advanced usage](#advanced-usage) for more information on each of the commands run by this abstraction and for control on GPU vs CPU device usage.
+4. Run `task` - this will install dependencies, build databases, and start the GUI application. See [advanced usage](#advanced-usage) for more information on each of the commands run by this abstraction and for control on GPU vs CPU device usage.
 
 ### Environment Variables
 
@@ -42,6 +42,10 @@ ARCH=cu128 # if ARCH = cu128, installs cuda GPU requirements, otherwise if ARCH 
 ## Enable LANGSMITH observability tracing
 # LANGSMITH_TRACING=true 
 # LANGSMITH_API_KEY=YOUR-API-KEY # https://www.langchain.com/langsmith 
+
+## Enable authentication to the application
+# AUTHENTICATION_SECRET_KEY=password123
+# AUTHENTICATION_USERNAME=user123
 ```
 Note, see [the LangSmith Tracing Example Image](#langsmith-tracing) to see what enabling tracing does!
 

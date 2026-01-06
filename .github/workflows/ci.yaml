@@ -19,8 +19,11 @@ jobs:
       with:
         enable-cache: true
 
+    - name: Install Task
+      run: sudo snap install task --classic
+
     - name: Install Deps
-      run: make .venv
+      run: task .venv
       env:
         ARCH: cpu
 
@@ -32,7 +35,7 @@ jobs:
         restore-keys: ${{ runner.os }}-mypy-
 
     - name: Lint
-      run: make lint-ci
+      run: task lint-ci
 
   test:
     runs-on: ubuntu-latest
@@ -57,13 +60,16 @@ jobs:
       with:
         enable-cache: true
 
+    - name: Install Task
+      run: sudo snap install task --classic
+
     - name: Install Deps
-      run: make .venv
+      run: task .venv
       env:
         ARCH: cpu
 
     - name: Run Tests
-      run: make test
+      run: task test
       env:
         LANGSMITH_TRACING: false
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}

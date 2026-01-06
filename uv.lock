@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 2
 requires-python = ">=3.12"
 resolution-markers = [
     "python_full_version >= '3.14' and extra != 'extra-14-cs5100-project-cpu' and extra == 'extra-14-cs5100-project-cu128'",
@@ -561,6 +561,7 @@ name = "cs5100-project"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "fastapi" },
     { name = "gradio" },
     { name = "langchain" },
     { name = "langchain-chroma" },
@@ -580,6 +581,7 @@ dependencies = [
     { name = "ruff" },
     { name = "sentence-transformers" },
     { name = "types-requests" },
+    { name = "uvicorn" },
 ]
 
 [package.optional-dependencies]
@@ -598,6 +600,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
+    { name = "fastapi", specifier = ">=0.121.0" },
     { name = "gradio", specifier = ">=5.23.1" },
     { name = "langchain", specifier = ">=1.0.3" },
     { name = "langchain-chroma", specifier = ">=1.0.0" },
@@ -619,6 +622,7 @@ requires-dist = [
     { name = "torch", marker = "extra == 'cpu'", specifier = ">=2.7.0", index = "https://download.pytorch.org/whl/cpu", conflict = { package = "cs5100-project", extra = "cpu" } },
     { name = "torch", marker = "extra == 'cu128'", specifier = ">=2.7.0", index = "https://download.pytorch.org/whl/cu128", conflict = { package = "cs5100-project", extra = "cu128" } },
     { name = "types-requests", specifier = ">=2.31.0" },
+    { name = "uvicorn", specifier = ">=0.38.0" },
 ]
 provides-extras = ["cpu", "cu128"]
 

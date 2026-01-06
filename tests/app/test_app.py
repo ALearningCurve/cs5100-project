@@ -2,7 +2,7 @@ import pytest
 from gradio import ChatMessage
 
 from src.agent.agent import setup_agent
-from src.app import handle_input
+from src.app.chatapp import handle_input
 
 # from src.agent.agentic_rag import AgenticRAG
 

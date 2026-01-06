@@ -33,6 +33,8 @@ def _get_or_fail(key: str) -> str:
   return val
 
 
+# 1. setup env vars for the ETL/Agent persistent storage
+
 PAPRIKA_EXPORT_PATH = Path(
   get("PAPRIKA_EXPORT_PATH", str(REPO_ROOT / "resources/paprika/export.paprikarecipes"))
 )
@@ -45,6 +47,19 @@ API_CACHE_DB_PATH = Path(
   get("API_CACHE_DB_PATH", str(REPO_ROOT / "resources/tools/api_cache.db"))
 )
 
+# 2. setup env vars for API keys
+
 GEMINI_API_KEY = _get_or_fail("GEMINI_API_KEY")
 SPOONACULAR_API_KEY = _get_or_fail("SPOONACULAR_API_KEY")
 RAPIDAPI_API_KEY = _get_or_fail("RAPIDAPI_API_KEY")
+
+
+# 3. setup env vars for the authentication
+AUTHENTICATION_SECRET_KEY = get("AUTHENTICATION_SECRET_KEY")
+AUTHENTICATION_USERNAME = get("AUTHENTICATION_USERNAME")
+assert (AUTHENTICATION_SECRET_KEY is None) == (AUTHENTICATION_USERNAME is None), (
+  "Partial authentication provided (key or username) but not the other"
+)
+SHOULD_AUTHENTICATE = AUTHENTICATION_SECRET_KEY is not None
+if SHOULD_AUTHENTICATE:
+  logger.critical("authentication disabled!")
