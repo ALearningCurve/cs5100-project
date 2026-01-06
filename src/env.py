@@ -61,5 +61,5 @@ assert (AUTHENTICATION_SECRET_KEY is None) == (AUTHENTICATION_USERNAME is None),
   "Partial authentication provided (key or username) but not the other"
 )
 SHOULD_AUTHENTICATE = AUTHENTICATION_SECRET_KEY is not None
-if SHOULD_AUTHENTICATE:
+if not SHOULD_AUTHENTICATE:
   logger.critical("authentication disabled!")

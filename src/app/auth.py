@@ -4,6 +4,7 @@ from fastapi import APIRouter, Form, Request, Response
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import BaseModel
 
+from src.app.rate_limit import limiter
 from src.env import (
   AUTHENTICATION_SECRET_KEY,
   AUTHENTICATION_USERNAME,
@@ -66,7 +67,10 @@ class UserLogin(BaseModel):
 
 
 @router.post("/login")
-async def do_login(user_data: Annotated[UserLogin, Form()]) -> Response:
+@limiter.limit("10/minute")
+async def do_login(
+  user_data: Annotated[UserLogin, Form()], request: Request
+) -> Response:
   """Verify key and set the cookie."""
   goto_chat_response = RedirectResponse(url="/chat", status_code=303)
   if SKIP_AUTHENTICATION:
