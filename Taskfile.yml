@@ -16,19 +16,16 @@ tasks:
 
   venv:
     desc: Set up virtual environment
+    status:
+      - test -d .venv
     cmds:
       - UV_TORCH_BACKEND=auto uv sync --frozen {{.EXTRAS_FLAG}}
 
   build:
     desc: Build the project
     deps: [venv]
-    sources:
-      - src/**
-      - resources/paprika/export.paprikarecipes
-    generates:
-      - .build
     status:
-      - test -f .build
+      - test -f .build && test "$(find src resources/paprika/export.paprikarecipes -type f -newer .build 2>/dev/null | wc -l)" -eq 0
     cmds:
       - uv run -m src.cmd.paprika_etl
       - touch .build

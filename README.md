@@ -7,6 +7,8 @@ This project aims to create an agentic search bot to assist in the querying, ret
 
 The project implements both single-agent and multi-agent search. The default operating mode is single-agent, but multi-agent can also be used if you are curious (see the [Multi-Agent RAG System](#multi-agent-rag-system) section)!
 
+The project uses a FastAPI api for backgend logic, Gradio for the chatbot GUI, and LangChain as the agent framework. Further details implementation details can be found in the rest of this document. 
+
 
 ## Table of Contents
 * [Table of Contents](#table-of-contents)
@@ -114,6 +116,16 @@ with the following:
  from src.agent.agentic_rag import AgenticRAG
  workflow = AgenticRAG().workflow
 ```
+
+### Security
+
+To be clear, this application is by no means a web-scale implementation. This carries over to its
+secureness/design as it is meant for internal (single tenant use). Nonetheless, there are a couple
+security features which have been implemented for those looking to deploy the application. This includes:
+
+- API rate-limiting
+- Optional authentication requirement for chatting (see [environment variables section](#environment-variables))
+- FastAPI (stdout) and chatbot (LangGraph) observability 
 
 ## Examples
 
