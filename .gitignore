@@ -217,3 +217,5 @@ resources/tools
 .build
 langchain_cache.db
 .gradio
+
+.task

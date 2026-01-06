@@ -89,7 +89,6 @@ def setup_agent() -> Agent:
     vectorstore=vectorstore, full_recipe_vectorstore=full_recipe_vectorstore, k=5
   )
   recipe_api_tool = RecipeAPI()
-  recipe_api_tool = RecipeAPI()
   mealdb_tool = MealDBWrapper()
   tasty_tool = TastyWrapper()
 

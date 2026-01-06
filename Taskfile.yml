@@ -1,0 +1,84 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+
+version: '3'
+
+env:
+  ARCH: '{{.ARCH}}'
+
+vars:
+  EXTRAS_FLAG: '{{if .ARCH}}--extra {{.ARCH}}{{end}}'
+
+tasks:
+  default:
+    desc: Default task - runs the app
+    deps: [run]
+
+  setup-env:
+    desc: Load .env file if it exists
+    silent: true
+
+  venv:
+    desc: Set up virtual environment
+    sources:
+      - pyproject.toml
+    generates:
+      - .venv
+    cmds:
+      - UV_TORCH_BACKEND=auto uv sync --frozen {{.EXTRAS_FLAG}}
+      - uv pip install langgraph-cli[inmem]
+    method: timestamp
+
+  build:
+    desc: Build the project
+    deps: [venv]
+    sources:
+      - src/**
+      - resources/paprika/export.paprikarecipes
+    generates:
+      - resources/chroma
+    cmds:
+      - uv run -m src.cmd.paprika_etl
+    method: timestamp
+
+  run:
+    desc: Run the application
+    deps: [build]
+    cmds:
+      - uv run -m src.cmd.start_app
+
+  clean:
+    desc: Clean build artifacts and virtual environment
+    cmds:
+      - rm -rf .venv
+      - rm -rf resources/chroma
+      - rm -f resources/paprika/.*.json
+
+  lint:
+    desc: Run linting checks
+    deps: [venv]
+    cmds:
+      - uv run ruff check
+      - uv run mypy --cache-fine-grained src
+
+  lint-ci:
+    desc: Run linting checks for CI
+    deps: [venv]
+    cmds:
+      - uv run ruff check
+      - uv run mypy src
+
+  lint-fix:
+    desc: Fix linting issues and format code
+    deps: [venv]
+    cmds:
+      - uv run ruff check --fix
+      - uv run ruff format
+      - task: lint
+
+  test:
+    desc: Run tests
+    deps: [venv]
+    env:
+      LANGSMITH_TRACING: 'false'
+    cmds:
+      - uv run pytest -r .
