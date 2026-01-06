@@ -1,5 +1,7 @@
 # Cheffy: The Agentic RAG System for Cooking Recipes
 
+> [!NOTE]
+> If deploying this application publicly, make sure to enable the authentication environment variables to prevent abuse of your LLM API keys! See [environment variables section](#environment-variables) for more information! 
 
 This project aims to create an agentic search bot to assist in the querying, retrieval, and synthesis of cooking recipes based on a given query from the user. Moving beyond a general LLM, this project aims enable a chatbot to be able to give personalized cooking advice and suggestions using both a custom database containing the user's own recipes (imported from [Paprika](https://www.paprikaapp.com/)) and various external APIs (such as [MealDB](https://www.themealdb.com/api.php), [Tasty API](https://rapidapi.com/apidojo/api/tasty), and [Spoonacular](https://spoonacular.com/food-api/console#Profile)) for searching up more general data. We have been able to implement both an ETL pipeline for paprika cookbooks and agentic search system to get great results (example conversations can be seen in the [examples section](#examples))!
 
@@ -19,9 +21,9 @@ The project implements both single-agent and multi-agent search. The default ope
 
 1. Install `uv` [(installation docs)](https://docs.astral.sh/uv/getting-started/installation/).
 2. Install `taskfile` [(installation docs)](https://taskfile.dev/docs/installation).
-2. Setup environment variables: Follow instructions in [environment variables section](#environment-variables).
-3. (Optional) If you want to use your own recipes instead of the default ones in the repo, [export your own cookbook in 'paprika recipe format'](https://paprikaapp.zendesk.com/hc/en-us/articles/360051324613-What-export-formats-do-you-support), and then replace the exported file in `resources/paprika/export.paprikarecipes`
-4. Run `task` - this will install dependencies, build databases, and start the GUI application. See [advanced usage](#advanced-usage) for more information on each of the commands run by this abstraction and for control on GPU vs CPU device usage.
+3. Setup environment variables: Follow instructions in [environment variables section](#environment-variables).
+4. [Export your own cookbook in 'paprika recipe format'](https://paprikaapp.zendesk.com/hc/en-us/articles/360051324613-What-export-formats-do-you-support), and then place the exported file in `resources/paprika/export.paprikarecipes`. If you are simply trying to run this application for playing around, then use the ["dummy" export](https://github.com/ALearningCurve/cs5100-project/raw/refs/heads/main/tests/fixtures/paprika/export.paprikarecipes) which is used for testing 
+5. Run `task` - this will install dependencies, build databases, and start the GUI application. See [advanced usage](#advanced-usage) for more information on each of the commands run by this abstraction and for control on GPU vs CPU device usage.
 
 ### Environment Variables
 
@@ -43,7 +45,7 @@ ARCH=cu128 # if ARCH = cu128, installs cuda GPU requirements, otherwise if ARCH 
 # LANGSMITH_TRACING=true 
 # LANGSMITH_API_KEY=YOUR-API-KEY # https://www.langchain.com/langsmith 
 
-## Enable authentication to the application
+## Requires that the user provides a fixed username and password to enter the application
 # AUTHENTICATION_SECRET_KEY=password123
 # AUTHENTICATION_USERNAME=user123
 ```
@@ -132,6 +134,7 @@ with the following:
 If tracing is configured in [environment variables](#environment-variables), the following type of debug view is made available (note, this view 
 tells you if cache was used, exact tool parameters, timing of inference calls, and so-on). 
 <img width="1199" height="1787" alt="langsmith_tracing" src="https://github.com/user-attachments/assets/e5492712-3286-4ad1-afaa-5725662c44db" />
+
 
 
 
