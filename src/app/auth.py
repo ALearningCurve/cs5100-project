@@ -36,6 +36,12 @@ async def index(request: Request) -> RedirectResponse:
   return RedirectResponse(url="/login")
 
 
+@router.get("/health")
+async def health(request: Request) -> Response:
+  """Show health status."""
+  return HTMLResponse("<h1>OK<h1/>")
+
+
 @router.get("/login")
 async def login_page(request: Request) -> Response:
   """A simple HTML login form."""

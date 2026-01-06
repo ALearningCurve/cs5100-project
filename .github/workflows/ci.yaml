@@ -20,7 +20,7 @@ jobs:
         enable-cache: true
 
     - name: Install Task
-      run: sudo snap install task --classic
+      uses: go-task/setup-task@v1
 
     - name: Install Deps
       run: task venv
@@ -61,7 +61,7 @@ jobs:
         enable-cache: true
 
     - name: Install Task
-      run: sudo snap install task --classic
+      uses: go-task/setup-task@v1
 
     - name: Install Deps
       run: task venv
