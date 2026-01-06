@@ -17,8 +17,23 @@ from src.app.auth import AUTH_COOKIE_NAME, router
 
 @contextmanager
 def auth_config(**env_patches: Any) -> Generator[Any, None, None]:
-  """Context manager to patch auth environment and reload the module."""
-  with patch.dict("src.env.__dict__", env_patches):
+  """Context manager to patch auth environment and reload the module.
+
+  Ensures all required auth env variables are present with defaults if needed.
+  """
+  import os
+
+  # Build patches with defaults for missing variables
+  defaults = {
+    "SHOULD_AUTHENTICATE": True,
+    "AUTHENTICATION_SECRET_KEY": os.getenv("AUTHENTICATION_SECRET_KEY", "test_key"),
+    "AUTHENTICATION_USERNAME": os.getenv("AUTHENTICATION_USERNAME", "test_user"),
+  }
+
+  # Merge with provided patches (patches override defaults)
+  patches = {**defaults, **env_patches}
+
+  with patch.dict("src.env.__dict__", patches):
     import src.app.auth
 
     reload(src.app.auth)
