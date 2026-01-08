@@ -11,7 +11,7 @@ from src.app.rate_limit import mount as mount_rate_limiter
 logger = logging.getLogger(__name__)
 
 
-def launch() -> None:
+def launch(run: bool = True) -> FastAPI:
   """Runs and launches the app."""
   app = FastAPI()
 
@@ -22,4 +22,7 @@ def launch() -> None:
   app.include_router(auth_router)
   app = mount_chat_interface(app)
 
-  uvicorn.run(app, host="0.0.0.0", port=8000)
+  if run:
+    uvicorn.run(app, host="0.0.0.0", port=8080)
+
+  return app
