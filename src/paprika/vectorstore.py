@@ -38,7 +38,9 @@ def _embeddings() -> Embeddings:
   # > @ALearningCurve 11-1: after experimentation this seems to work well
 
   model_name = EMBEDDINGS_MODEL_NAME
-  if HF_VECTORIZER_CACHE is not None:
+  if HF_VECTORIZER_CACHE is None:
+    logger.warning("not using cache")
+  else:
     assert HF_VECTORIZER_CACHE.exists(), "want to use cache"
     model_name = str(HF_VECTORIZER_CACHE)
 
