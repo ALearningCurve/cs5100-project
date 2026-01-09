@@ -1,37 +1,28 @@
-# Stage 1: Build dependencies using UV
+# ---------- Builder ----------
 FROM python:3.12-slim AS builder
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 WORKDIR /build
+COPY pyproject.toml uv.lock ./
 
-# Install UV
-RUN pip install uv
+# Create a virtual environment and install dependencies into it
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-dev --no-install-project --extra cpu
 
-# Copy dependency files
-COPY pyproject.toml uv.lock* ./
-
-# Create virtual environment and install dependencies
-RUN uv venv /opt/venv
-RUN UV_TORCH_BACKEND=auto uv sync --frozen --no-dev --extra cpu
-
-# Stage 2: Runtime image (minimal)
+# ---------- Runtime ----------
 FROM python:3.12-slim
-
 WORKDIR /app
 
-# Copy virtual environment from builder
-COPY --from=builder /opt/venv /opt/venv
+# Copy the virtual environment from the builder
+COPY --from=builder /build/.venv /app/.venv
+# Ensure the app uses the virtual environment
+ENV PATH="/app/.venv/bin:$PATH"
 
-# Copy application files
 COPY src ./src
 COPY resources ./resources
 COPY main.py .
 
-# Set environment to use venv
-ENV PATH="/opt/venv/bin:$PATH" \
-    PYTHONUNBUFFERED=1
-
-# Expose port for uvicorn
+ENV PYTHONUNBUFFERED=1
 EXPOSE 8080
-
-# Default command
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "1"]
+CMD ["python", "-m", "src.cmd.start_app"]

@@ -37,6 +37,7 @@ async def index(request: Request) -> RedirectResponse:
 
 
 @router.get("/health")
+@limiter.exempt
 async def health(request: Request) -> Response:
   """Show health status."""
   return HTMLResponse("<h1>OK<h1/>")
