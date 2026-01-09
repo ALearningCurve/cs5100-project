@@ -1,22 +1,19 @@
 # ---------- Builder ----------
 FROM python:3.12-slim AS builder
-# Install uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 WORKDIR /build
+
+ENV UV_CACHE_DIR=/root/.cache/uv
+
 COPY pyproject.toml uv.lock ./
 
-# Create a virtual environment and install dependencies into it
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --no-dev --no-install-project --extra cpu
+RUN uv sync --frozen --no-dev --no-install-project --extra cpu
 
 # ---------- Runtime ----------
 FROM python:3.12-slim
 WORKDIR /app
-
-# Copy the virtual environment from the builder
 COPY --from=builder /build/.venv /app/.venv
-# Ensure the app uses the virtual environment
 ENV PATH="/app/.venv/bin:$PATH"
 
 COPY src ./src
