@@ -1,5 +1,6 @@
+# ruff: noqa
 import logging
-
+import src.env
 from fastapi import FastAPI
 
 from src.app import launch

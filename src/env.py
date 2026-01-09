@@ -33,6 +33,13 @@ def _get_or_fail(key: str) -> str:
   return val
 
 
+def disable_gradio_tracking() -> None:
+  """Disables gradio telemetry."""
+  os.environ.setdefault("GRADIO_ANALYTICS_ENABLED", "False")
+
+
+disable_gradio_tracking()
+
 # 1. setup env vars for the ETL/Agent persistent storage
 
 PAPRIKA_EXPORT_PATH = Path(

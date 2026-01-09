@@ -1,3 +1,4 @@
+import logging
 import shutil
 from functools import lru_cache
 from typing import TypeAlias
@@ -11,6 +12,8 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from src.env import REPO_ROOT
 from src.paprika.chunker import Chunk, ChunkMetadata
+
+logger = logging.getLogger(__name__)
 
 VectorStore: TypeAlias = Chroma
 
@@ -34,9 +37,12 @@ def _embeddings() -> Embeddings:
   # @ALearningCurve 10-30: do we need fine-tuning of the embedding model?
   # > @ALearningCurve 11-1: after experimentation this seems to work well
 
+  cache_path = CHROMA_ROOT / f"models/{EMBEDDINGS_MODEL_NAME}".replace("/", "--")
+  if not cache_path.exists():
+    logger.warning("cached vectorizer not found!")
+
   return HuggingFaceEmbeddings(
-    model_name=EMBEDDINGS_MODEL_NAME,
-    show_progress=True,
+    model_name=EMBEDDINGS_MODEL_NAME, show_progress=True, cache_folder=str(CHROMA_ROOT)
   )
 
 
