@@ -10,7 +10,7 @@ from langchain_core.embeddings import Embeddings
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-from src.env import REPO_ROOT
+from src.env import HF_VECTORIZER_CACHE, REPO_ROOT
 from src.paprika.chunker import Chunk, ChunkMetadata
 
 logger = logging.getLogger(__name__)
@@ -37,13 +37,12 @@ def _embeddings() -> Embeddings:
   # @ALearningCurve 10-30: do we need fine-tuning of the embedding model?
   # > @ALearningCurve 11-1: after experimentation this seems to work well
 
-  cache_path = CHROMA_ROOT / f"models/{EMBEDDINGS_MODEL_NAME}".replace("/", "--")
-  if not cache_path.exists():
-    logger.warning("cached vectorizer not found!")
+  model_name = EMBEDDINGS_MODEL_NAME
+  if HF_VECTORIZER_CACHE is not None:
+    assert HF_VECTORIZER_CACHE.exists(), "want to use cache"
+    model_name = str(HF_VECTORIZER_CACHE)
 
-  return HuggingFaceEmbeddings(
-    model_name=EMBEDDINGS_MODEL_NAME, show_progress=True, cache_folder=str(CHROMA_ROOT)
-  )
+  return HuggingFaceEmbeddings(model_name=model_name)
 
 
 def connect(full_recipes: bool = False) -> VectorStore:

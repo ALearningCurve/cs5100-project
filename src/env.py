@@ -54,6 +54,12 @@ API_CACHE_DB_PATH = Path(
   get("API_CACHE_DB_PATH", str(REPO_ROOT / "resources/tools/api_cache.db"))
 )
 
+HF_VECTORIZER_CACHE = (
+  None
+  if os.environ.get("HF_VECTORIZER_CACHE") is None
+  else Path(get("HF_VECTORIZER_CACHE", ""))
+)
+
 # 2. setup env vars for API keys
 
 GEMINI_API_KEY = _get_or_fail("GEMINI_API_KEY")
